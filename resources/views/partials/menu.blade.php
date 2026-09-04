@@ -88,6 +88,54 @@
                             @endif
                         </ul>
                     </li>
+
+                    {{-- Manage News --}}
+<li class="nav-item nav-item-submenu
+    {{ in_array(Route::currentRouteName(), [
+        'admin.news.index',
+        'admin.news.create',
+        'admin.news.edit',
+        'admin.news.show'
+    ]) ? 'nav-item-expanded nav-item-open' : '' }}">
+
+    <a href="#"
+       class="nav-link
+       {{ in_array(Route::currentRouteName(), [
+           'admin.news.index',
+           'admin.news.create',
+           'admin.news.edit',
+           'admin.news.show'
+       ]) ? 'active' : '' }}">
+
+        <i class="icon-newspaper"></i>
+        <span>Actualités</span>
+    </a>
+
+    <ul class="nav nav-group-sub">
+
+        {{-- News List --}}
+        <li class="nav-item">
+            <a href="{{ route('admin.news.index') }}"
+               class="nav-link
+               {{ in_array(Route::currentRouteName(), [
+                   'admin.news.index',
+                   'admin.news.edit',
+                   'admin.news.show'
+               ]) ? 'active' : '' }}">
+                Liste des actualités
+            </a>
+        </li>
+
+        {{-- Create News --}}
+        <li class="nav-item">
+            <a href="{{ route('admin.news.create') }}"
+               class="nav-link {{ Route::is('admin.news.create') ? 'active' : '' }}">
+                Ajouter une actualité
+            </a>
+        </li>
+
+    </ul>
+</li>
                 @endif
 
                 {{--Manage Students--}}
