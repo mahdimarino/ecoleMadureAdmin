@@ -31,18 +31,29 @@ class NewsController extends Controller
 
     public function featured(): JsonResponse
     {
-        $news = News::where('is_published', 1)
-            ->orderByDesc('is_featured')
+        $featured = News::where('is_published', 1)
+            ->where('is_featured', 1)
             ->orderByDesc('published_at')
             ->orderByDesc('created_at')
             ->take(3)
             ->get();
 
+        if ($featured->count() < 3) {
+            $remaining = 3 - $featured->count();
+
+            $latest = News::where('is_published', 1)
+                ->where('is_featured', 0)
+                ->orderByDesc('published_at')
+                ->orderByDesc('created_at')
+                ->take($remaining)
+                ->get();
+
+            $featured = $featured->concat($latest);
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $news->map(function ($article) {
-                return $this->formatNews($article);
-            }),
+            'data' => $featured->map(fn($item) => $this->formatNews($item))->values(),
         ]);
     }
 
