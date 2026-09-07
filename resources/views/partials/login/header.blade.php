@@ -1,8 +1,8 @@
 <!-- Main navbar -->
-<div class="navbar navbar-expand-md navbar-dark">
+{{-- <div class="navbar navbar-expand-md navbar-dark">
     <div class="mt-2 mr-5">
         <a href="{{ route('dashboard') }}" class="d-inline-block">
-            <h4 class="text-bold text-white">École Madaure draria</h4>
+            <h4 class="text-bold text-white">École Madaure drariaaa</h4>
         </a>
     </div>
 
@@ -36,5 +36,5 @@
             </li>
         </ul>
     </div>
-</div>
+</div> --}}
 <!-- /main navbar -->
