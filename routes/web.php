@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 
 Route::get('/test-email', function () {
 
-    Mail::to('YOUR_EMAIL@gmail.com')->send(
+    Mail::to('mahdismahi.13@gmail.com')->send(
         new ContactFormMail(
             'Test Contact Form',
             [
