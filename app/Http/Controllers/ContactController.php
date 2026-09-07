@@ -23,9 +23,9 @@ class ContactController extends Controller
         Contact::create($validated);
 
         // Email recipients
-        $toEmail = 'landing.pages@aristademand.com';
+        $toEmail = 'mahdismahi.13@gmail.com';
         $ccEmails = [
-            'mahdismahi.13@gmail.com'
+            'santsu.mehdi@gmail.com'
         ];
 
         // Send email
