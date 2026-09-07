@@ -3,6 +3,27 @@
 use Illuminate\Support\Facades\Route; // <- ADD THIS IMPORT AT THE TOP
 use App\Http\Controllers\Admin\NewsController; // <- Import NewsController
 
+use App\Mail\ContactFormMail;
+use Illuminate\Support\Facades\Mail;
+
+Route::get('/test-email', function () {
+
+    Mail::to('YOUR_EMAIL@gmail.com')->send(
+        new ContactFormMail(
+            'Test Contact Form',
+            [
+                'full_name' => 'Test User',
+                'email' => 'test@example.com',
+                'mobile_number' => '+971500000000',
+                'subject' => 'Test Email',
+                'message' => 'This is a test email from the Laravel contact form.'
+            ]
+        )
+    );
+
+    return 'Test email sent!';
+});
+
 Auth::routes();
 
 
