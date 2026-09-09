@@ -26,7 +26,11 @@ Route::get('/test-email', function () {
 
 Auth::routes();
 
+Route::get('/teacherregrstarsion', 'SupportTeam\UserController@teacherRegistration')
+    ->name('teacherregrstarsion');
 
+Route::post('/teacherregrstarsion', 'SupportTeam\UserController@registerTeacher')
+    ->name('teacher.registration.store');
 //Route::get('/test', 'TestController@index')->name('test');
 Route::get('/privacy-policy', 'HomeController@privacy_policy')->name('privacy_policy');
 Route::get('/terms-of-use', 'HomeController@terms_of_use')->name('terms_of_use');

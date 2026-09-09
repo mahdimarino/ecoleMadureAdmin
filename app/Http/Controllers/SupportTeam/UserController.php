@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\SupportTeam;
 
 use App\Helpers\Qs;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use App\Repositories\LocationRepo;
 use App\Repositories\MyClassRepo;
 use App\Repositories\UserRepo;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -62,6 +63,86 @@ class UserController extends Controller
         $data['password'] = Hash::make('user');
         $this->user->update($id, $data);
         return back()->with('flash_success', __('msg.pu_reset'));
+    }
+
+    public function registerTeacher(Request $req)
+    {
+        $data = $req->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users,email',
+            'username' => 'required|string|max:255|unique:users,username',
+            'password' => 'required|string|min:6',
+            'phone'    => 'required|string|max:30',
+            'phone2'   => 'nullable|string|max:30',
+            'gender'   => 'required|string',
+            'address'  => 'required|string|max:255',
+            'nal_id'   => 'required',
+            'state_id' => 'required',
+            'lga_id'   => 'required',
+            'bg_id'    => 'nullable',
+            'emp_date' => 'nullable',
+            'photo'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Automatically make this user a teacher
+        $data['user_type'] = 'teacher';
+
+        // Default photo
+        $data['photo'] = Qs::getDefaultUserImage();
+
+        // Generate user code
+        $data['code'] = strtoupper(Str::random(10));
+
+        // Hash password
+        $data['password'] = Hash::make($req->password);
+
+        // Upload photo
+        if ($req->hasFile('photo')) {
+
+            $photo = $req->file('photo');
+
+            $f = Qs::getFileMetaData($photo);
+
+            $f['name'] = 'photo.' . $f['ext'];
+
+            $f['path'] = $photo->storeAs(
+                Qs::getUploadPath('teacher') . $data['code'],
+                $f['name']
+            );
+
+            $data['photo'] = asset('storage/' . $f['path']);
+        }
+
+        // Create teacher
+        $user = $this->user->create($data);
+
+        // Create staff record
+        $staff_id = Qs::getAppCode()
+            . '/STAFF/'
+            . date('Y/m')
+            . '/'
+            . mt_rand(1000, 9999);
+
+        $d2 = $req->only(Qs::getStaffRecord());
+
+        $d2['user_id'] = $user->id;
+        $d2['code'] = $staff_id;
+
+        $this->user->createStaffRecord($d2);
+
+        return redirect()
+            ->route('teacherregrstarsion')
+            ->with('success', 'Teacher registration successful!');
+    }
+
+    public function teacherRegistration()
+    {
+        $d['user_types'] = $this->user->getAllTypes();
+        $d['states'] = $this->loc->getStates();
+        $d['nationals'] = $this->loc->getAllNationals();
+        $d['blood_groups'] = $this->user->getBloodGroups();
+
+        return view('auth.teacherregrstarsion', $d);
     }
 
     public function store(UserRequest $req)
