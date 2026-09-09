@@ -88,6 +88,18 @@
                             @endif
                         </ul>
                     </li>
+                    {{-- Student Applications --}}
+<li class="nav-item">
+    <a href="{{ route('student-applications.index') }}"
+       class="nav-link {{ in_array(Route::currentRouteName(), [
+           'student-applications.index',
+           'student-applications.show'
+       ]) ? 'active' : '' }}">
+
+        <i class="icon-file-text2"></i>
+        <span>Demandes d'inscription</span>
+    </a>
+</li>
 
                     {{-- Manage News --}}
 <li class="nav-item nav-item-submenu

@@ -51,6 +51,33 @@ Route::group(['middleware' => 'auth'], function () {
     /*************** Support Team *****************/
     Route::group(['namespace' => 'SupportTeam',], function () {
 
+        /*
+|--------------------------------------------------------------------------
+| Student Applications
+|--------------------------------------------------------------------------
+*/
+
+        Route::group(['prefix' => 'student-applications'], function () {
+
+            Route::get('/', 'StudentApplicationController@index')
+                ->name('student-applications.index');
+
+            Route::get('/{id}/edit', 'StudentApplicationController@edit')
+                ->name('student-applications.edit');
+
+            Route::put('/{id}', 'StudentApplicationController@update')
+                ->name('student-applications.update');
+
+            Route::get('/{id}', 'StudentApplicationController@show')
+                ->name('student-applications.show');
+
+            Route::put('/{id}/status', 'StudentApplicationController@updateStatus')
+                ->name('student-applications.status');
+
+            Route::delete('/{id}', 'StudentApplicationController@destroy')
+                ->name('student-applications.destroy');
+        });
+
         /*************** Students *****************/
         Route::group(['prefix' => 'students'], function () {
             Route::get('reset_pass/{st_id}', 'StudentRecordController@reset_pass')->name('st.reset_pass');
