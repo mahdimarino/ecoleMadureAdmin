@@ -342,7 +342,7 @@ class CalendarController extends Controller
     /**
      * Update event
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $event_id)
     {
         $request->validate([
             'date'       => 'required|date',
@@ -355,12 +355,12 @@ class CalendarController extends Controller
         $row = TimeTable::with([
             'tt_record',
             'subject'
-        ])->find($id);
+        ])->find($event_id);
 
         if (!$row) {
             return response()->json([
                 'ok' => false,
-                'msg' => 'Timetable record not found. ID: ' . $id,
+                'msg' => 'Timetable record not found. ID: ' . $event_id,
             ], 404);
         }
 
@@ -438,12 +438,12 @@ class CalendarController extends Controller
     /**
      * Delete event
      */
-    public function destroy($id)
+    public function destroy($event_id)
     {
         $row = TimeTable::with([
             'tt_record',
             'subject'
-        ])->findOrFail($id);
+        ])->findOrFail($event_id);
 
         $this->checkEventPermission($row);
 

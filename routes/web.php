@@ -88,11 +88,9 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/events', 'CalendarController@store')
                 ->name('calendar.events.store');
 
-            Route::put('/events/{id}', 'CalendarController@update')
-                ->name('calendar.events.update');
-
-            Route::delete('/events/{id}', 'CalendarController@destroy')
-                ->name('calendar.events.destroy');
+            // routes/web.php
+            Route::put('/events/{event_id}', 'CalendarController@update')->name('calendar.events.update');
+            Route::delete('/events/{event_id}', 'CalendarController@destroy')->name('calendar.events.destroy');
         });
 
         /*************** Students *****************/
