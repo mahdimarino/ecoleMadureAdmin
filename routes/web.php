@@ -78,6 +78,23 @@ Route::group(['middleware' => 'auth'], function () {
                 ->name('student-applications.destroy');
         });
 
+        /*************** Dashboard Calendar *****************/
+
+        Route::group(['prefix' => 'calendar'], function () {
+
+            Route::get('/events', 'CalendarController@events')
+                ->name('calendar.events');
+
+            Route::post('/events', 'CalendarController@store')
+                ->name('calendar.events.store');
+
+            Route::put('/events/{id}', 'CalendarController@update')
+                ->name('calendar.events.update');
+
+            Route::delete('/events/{id}', 'CalendarController@destroy')
+                ->name('calendar.events.destroy');
+        });
+
         /*************** Students *****************/
         Route::group(['prefix' => 'students'], function () {
             Route::get('reset_pass/{st_id}', 'StudentRecordController@reset_pass')->name('st.reset_pass');

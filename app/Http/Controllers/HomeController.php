@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Qs;
 use App\Repositories\UserRepo;
+use App\Models\Exam;
+use App\Models\MyClass;
+use App\Models\Subject;
 
 class HomeController extends Controller
 {
@@ -37,9 +40,69 @@ class HomeController extends Controller
 
     public function dashboard()
     {
-        $d=[];
-        if(Qs::userIsTeamSAT()){
+        $d = [];
+
+        if (Qs::userIsTeamSAT()) {
             $d['users'] = $this->user->getAll();
+        }
+
+        $user = auth()->user();
+
+        $d['calendar_classes'] = collect();
+        $d['calendar_subjects'] = collect();
+        $d['calendar_exams'] = Exam::where(
+            'year',
+            Qs::getCurrentSession()
+        )->orderBy('name')->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | ADMIN
+    |--------------------------------------------------------------------------
+    */
+
+        if (in_array($user->user_type, ['admin', 'super_admin'])) {
+
+            $d['calendar_classes'] = MyClass::orderBy('name')->get();
+
+            $d['calendar_subjects'] = Subject::with('my_class')
+                ->orderBy('name')
+                ->get();
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | TEACHER
+    |--------------------------------------------------------------------------
+    */ elseif ($user->user_type === 'teacher') {
+
+            $d['calendar_subjects'] = Subject::with('my_class')
+                ->where('teacher_id', $user->id)
+                ->orderBy('name')
+                ->get();
+
+            $d['calendar_classes'] = $d['calendar_subjects']
+                ->pluck('my_class')
+                ->filter()
+                ->unique('id')
+                ->values();
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | STUDENT
+    |--------------------------------------------------------------------------
+    */ elseif ($user->user_type === 'student') {
+
+            $student = Qs::findStudentRecord($user->id);
+
+            if ($student) {
+                $class = MyClass::find($student->my_class_id);
+
+                if ($class) {
+                    $d['calendar_classes'] = collect([$class]);
+                }
+            }
         }
 
         return view('pages.support_team.dashboard', $d);
