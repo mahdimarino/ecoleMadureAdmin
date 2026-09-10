@@ -659,21 +659,35 @@ $(document).ready(function () {
 
             error: function(xhr) {
 
-                var message = 'Une erreur est survenue.';
+    console.log('Calendar update error:', xhr);
+    console.log('Response:', xhr.responseJSON);
 
-                if (xhr.responseJSON &&
-                    xhr.responseJSON.message) {
+    var message = 'Une erreur est survenue.';
 
-                    message = xhr.responseJSON.message;
+    if (xhr.responseJSON) {
 
-                }
+        if (xhr.responseJSON.msg) {
+            message = xhr.responseJSON.msg;
+        }
 
-                flash({
-                    msg: message,
-                    type: 'danger'
-                });
+        else if (xhr.responseJSON.message) {
+            message = xhr.responseJSON.message;
+        }
 
-            }
+        else if (xhr.responseJSON.errors) {
+
+            message = Object.values(xhr.responseJSON.errors)
+                .flat()
+                .join('<br>');
+
+        }
+    }
+
+    flash({
+        msg: message,
+        type: 'danger'
+    });
+}
 
         });
 
@@ -708,13 +722,11 @@ $(document).ready(function () {
             props.type
         );
 
-        $('#calendar_type')
-            .val(props.type)
-            .prop('disabled', true);
+       $('#calendar_type')
+    .val(props.type);
 
-        $('#calendar_class_id')
-            .val(props.class_id)
-            .prop('disabled', true);
+$('#calendar_class_id')
+    .val(props.class_id);
 
         $('#calendar_subject_id')
             .val(props.subject_id);
@@ -732,9 +744,8 @@ $(document).ready(function () {
 
             $('#calendar_exam_group').show();
 
-            $('#calendar_exam_id')
-                .val(props.exam_id)
-                .prop('disabled', true);
+           $('#calendar_exam_id')
+    .val(props.exam_id);
 
         } else {
 
