@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\SupportTeam;
 
+
+
 use App\Helpers\Qs;
 use App\Http\Controllers\Controller;
 use App\Models\Exam;
@@ -10,6 +12,7 @@ use App\Models\Subject;
 use App\Models\TimeSlot;
 use App\Models\TimeTable;
 use App\Models\TimeTableRecord;
+use App\Models\StudentRecord;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +37,9 @@ class CalendarController extends Controller
             'tt_record.exam'
         ]);
 
+        // Requested class filter (from the "Classe" selector above the calendar)
+        $class_id = $request->class_id;
+
         /*
         |--------------------------------------------------------------------------
         | PERMISSIONS
@@ -43,9 +49,19 @@ class CalendarController extends Controller
         // Teacher = only subjects/classes assigned to teacher
         if ($user->user_type === 'teacher') {
 
+            $allowed_class_ids = Subject::where('teacher_id', $user->id)
+                ->pluck('my_class_id')
+                ->unique();
+
             $query->whereHas('subject', function ($q) use ($user) {
                 $q->where('teacher_id', $user->id);
             });
+
+            if ($class_id && $allowed_class_ids->contains((int) $class_id)) {
+                $query->whereHas('tt_record', function ($q) use ($class_id) {
+                    $q->where('my_class_id', $class_id);
+                });
+            }
         }
 
         // Student = only his/her class
@@ -62,7 +78,36 @@ class CalendarController extends Controller
             });
         }
 
-        // admin / super_admin = everything
+        // Parent = only classes his/her children are in
+        elseif ($user->user_type === 'parent') {
+
+            $children_class_ids = StudentRecord::where('my_parent_id', $user->id)
+                ->pluck('my_class_id')
+                ->filter()
+                ->unique();
+
+            if ($children_class_ids->isEmpty()) {
+                return response()->json([]);
+            }
+
+            if ($class_id && $children_class_ids->contains((int) $class_id)) {
+                $query->whereHas('tt_record', function ($q) use ($class_id) {
+                    $q->where('my_class_id', $class_id);
+                });
+            } else {
+                $query->whereHas('tt_record', function ($q) use ($children_class_ids) {
+                    $q->whereIn('my_class_id', $children_class_ids);
+                });
+            }
+        }
+
+        // admin / super_admin = everything, optionally narrowed to one class
+        elseif ($class_id) {
+
+            $query->whereHas('tt_record', function ($q) use ($class_id) {
+                $q->where('my_class_id', $class_id);
+            });
+        }
 
         $rows = $query->get();
 
@@ -183,6 +228,7 @@ class CalendarController extends Controller
 
         return response()->json($events);
     }
+
 
 
     /**

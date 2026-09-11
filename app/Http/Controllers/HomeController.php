@@ -7,6 +7,7 @@ use App\Repositories\UserRepo;
 use App\Models\Exam;
 use App\Models\MyClass;
 use App\Models\Subject;
+use App\Models\StudentRecord;
 
 class HomeController extends Controller
 {
@@ -103,6 +104,22 @@ class HomeController extends Controller
                     $d['calendar_classes'] = collect([$class]);
                 }
             }
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | PARENT
+    |--------------------------------------------------------------------------
+    */ elseif ($user->user_type === 'parent') {
+
+            $class_ids = StudentRecord::where('my_parent_id', $user->id)
+                ->pluck('my_class_id')
+                ->filter()
+                ->unique();
+
+            $d['calendar_classes'] = MyClass::whereIn('id', $class_ids)
+                ->orderBy('name')
+                ->get();
         }
 
         return view('pages.support_team.dashboard', $d);
