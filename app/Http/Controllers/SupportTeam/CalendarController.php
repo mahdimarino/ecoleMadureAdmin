@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CalendarController extends Controller
 {
@@ -551,5 +552,282 @@ class CalendarController extends Controller
         }
 
         abort(403);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMPORT SCHEDULE (bulk, per class)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Classes the current user (teacher/admin) is allowed to import a
+     * schedule for.
+     */
+    private function importableClasses()
+    {
+        $user = Auth::user();
+
+        if (in_array($user->user_type, ['admin', 'super_admin'])) {
+            return MyClass::orderBy('name')->get();
+        }
+
+        if ($user->user_type === 'teacher') {
+            return Subject::where('teacher_id', $user->id)
+                ->with('my_class')
+                ->get()
+                ->pluck('my_class')
+                ->filter()
+                ->unique('id')
+                ->sortBy('name')
+                ->values();
+        }
+
+        abort(403);
+    }
+
+    /**
+     * Step 1 (choose class) + Step 2 (template + upload) page.
+     */
+    public function importForm(Request $request)
+    {
+        $classes = $this->importableClasses();
+
+        $d['classes'] = $classes;
+        $d['selected_class'] = null;
+        $d['subjects'] = collect();
+
+        if ($request->filled('class_id')) {
+            $classId = (int) $request->class_id;
+
+            if (!$classes->pluck('id')->contains($classId)) {
+                abort(403, 'You can only import a schedule for your own classes.');
+            }
+
+            $user = Auth::user();
+            $d['selected_class'] = MyClass::findOrFail($classId);
+
+            $subjectsQuery = Subject::where('my_class_id', $classId);
+            if ($user->user_type === 'teacher') {
+                $subjectsQuery->where('teacher_id', $user->id);
+            }
+            $d['subjects'] = $subjectsQuery->orderBy('name')->get();
+        }
+
+        return view('pages.support_team.timetables.import', $d);
+    }
+
+    /**
+     * Downloadable starter CSV for the chosen class.
+     */
+    public function importTemplate(Request $request)
+    {
+        $request->validate(['class_id' => 'required|exists:my_classes,id']);
+
+        $classes = $this->importableClasses();
+        $classId = (int) $request->class_id;
+
+        if (!$classes->pluck('id')->contains($classId)) {
+            abort(403, 'You can only import a schedule for your own classes.');
+        }
+
+        $user = Auth::user();
+        $class = MyClass::findOrFail($classId);
+
+        $subjectsQuery = Subject::where('my_class_id', $classId);
+        if ($user->user_type === 'teacher') {
+            $subjectsQuery->where('teacher_id', $user->id);
+        }
+        $subjects = $subjectsQuery->pluck('name');
+
+        $filename = 'schedule_template_' . Str::slug($class->name) . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($subjects) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['day', 'start_time', 'end_time', 'subject']);
+            fputcsv($out, ['Monday', '08:00', '09:00', $subjects->first() ?? 'Math']);
+            fputcsv($out, ['# valid days: Monday Tuesday Wednesday Thursday Friday Saturday Sunday']);
+            fputcsv($out, ['# times use 24h format HH:MM']);
+            fputcsv($out, ['# subjects available for this class: ' . $subjects->implode(', ')]);
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Bulk-import a weekly schedule (CSV) for one class. Each valid row
+     * becomes one recurring weekly TimeTable slot (same storage/display
+     * mechanism as a single manually-added "Emploi du temps" event).
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'class_id' => 'required|exists:my_classes,id',
+            'csv_file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $classes = $this->importableClasses();
+        $classId = (int) $request->class_id;
+
+        if (!$classes->pluck('id')->contains($classId)) {
+            abort(403, 'You can only import a schedule for your own classes.');
+        }
+
+        $user = Auth::user();
+        $class = MyClass::findOrFail($classId);
+
+        $subjectsByName = Subject::where('my_class_id', $classId)
+            ->when($user->user_type === 'teacher', function ($q) use ($user) {
+                $q->where('teacher_id', $user->id);
+            })
+            ->get()
+            ->keyBy(function ($s) {
+                return Str::lower(trim($s->name));
+            });
+
+        $validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $year = Qs::getCurrentSession();
+
+        $handle = fopen($request->file('csv_file')->getRealPath(), 'r');
+        fgetcsv($handle); // skip header row
+
+        $created = 0;
+        $skipped = [];
+        $rowNum = 1;
+
+        DB::beginTransaction();
+
+        try {
+            $ttr = TimeTableRecord::where('my_class_id', $classId)
+                ->whereNull('exam_id')
+                ->where('year', $year)
+                ->first();
+
+            if (!$ttr) {
+                $ttr = TimeTableRecord::create([
+                    'name' => $class->name . ' - Class Schedule',
+                    'my_class_id' => $classId,
+                    'exam_id' => null,
+                    'year' => $year,
+                ]);
+            }
+
+            while (($row = fgetcsv($handle)) !== false) {
+                $rowNum++;
+
+                if (!isset($row[0]) || trim($row[0]) === '' || Str::startsWith(trim($row[0]), '#')) {
+                    continue;
+                }
+
+                [$day, $startTime, $endTime, $subjectName] = array_pad($row, 4, null);
+                $day = ucfirst(strtolower(trim($day ?? '')));
+                $subjectKey = Str::lower(trim($subjectName ?? ''));
+
+                if (!in_array($day, $validDays)) {
+                    $skipped[] = "Row {$rowNum}: invalid day \"{$day}\"";
+                    continue;
+                }
+
+                if (
+                    !preg_match('/^\d{1,2}:\d{2}$/', trim($startTime ?? '')) ||
+                    !preg_match('/^\d{1,2}:\d{2}$/', trim($endTime ?? ''))
+                ) {
+                    $skipped[] = "Row {$rowNum}: invalid time format (use HH:MM)";
+                    continue;
+                }
+
+                if (!$subjectsByName->has($subjectKey)) {
+                    $skipped[] = "Row {$rowNum}: subject \"{$subjectName}\" not found for this class"
+                        . ($user->user_type === 'teacher' ? ' (or not taught by you)' : '');
+                    continue;
+                }
+
+                try {
+                    $from = Carbon::createFromFormat('H:i', trim($startTime));
+                    $to = Carbon::createFromFormat('H:i', trim($endTime));
+                } catch (\Exception $e) {
+                    $skipped[] = "Row {$rowNum}: could not parse times";
+                    continue;
+                }
+
+                if ($to->lte($from)) {
+                    $skipped[] = "Row {$rowNum}: end_time must be after start_time";
+                    continue;
+                }
+
+                $subject = $subjectsByName->get($subjectKey);
+                $timeFrom = $from->format('g:i A');
+                $timeTo = $to->format('g:i A');
+
+                $slot = TimeSlot::where('ttr_id', $ttr->id)
+                    ->where('time_from', $timeFrom)
+                    ->where('time_to', $timeTo)
+                    ->first();
+
+                if (!$slot) {
+                    $slot = TimeSlot::create([
+                        'ttr_id' => $ttr->id,
+                        'hour_from' => $from->format('g'),
+                        'min_from' => $from->format('i'),
+                        'meridian_from' => $from->format('A'),
+                        'hour_to' => $to->format('g'),
+                        'min_to' => $to->format('i'),
+                        'meridian_to' => $to->format('A'),
+                        'time_from' => $timeFrom,
+                        'time_to' => $timeTo,
+                        'timestamp_from' => $from->timestamp,
+                        'timestamp_to' => $to->timestamp,
+                        'full' => $timeFrom . ' - ' . $timeTo,
+                    ]);
+                }
+
+                $exists = TimeTable::where('ttr_id', $ttr->id)
+                    ->where('ts_id', $slot->id)
+                    ->where('day', $day)
+                    ->exists();
+
+                if ($exists) {
+                    $skipped[] = "Row {$rowNum}: {$day} {$timeFrom}-{$timeTo} already exists, skipped";
+                    continue;
+                }
+
+                TimeTable::create([
+                    'ttr_id' => $ttr->id,
+                    'ts_id' => $slot->id,
+                    'subject_id' => $subject->id,
+                    'exam_date' => null,
+                    'day' => $day,
+                    'timestamp_from' => strtotime(now()->format('Y-m-d') . ' ' . $timeFrom),
+                    'timestamp_to' => strtotime(now()->format('Y-m-d') . ' ' . $timeTo),
+                ]);
+
+                $created++;
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            fclose($handle);
+            return back()->with('flash_danger', 'Import failed: ' . $e->getMessage());
+        }
+
+        fclose($handle);
+
+        $msg = "{$created} schedule slot(s) imported successfully.";
+        if (count($skipped)) {
+            $msg .= ' ' . count($skipped) . ' row(s) skipped — see details below.';
+        }
+
+        return back()
+            ->with($created ? 'flash_success' : 'flash_danger', $msg)
+            ->with('import_skipped', $skipped)
+            ->with('class_id', $classId);
     }
 }

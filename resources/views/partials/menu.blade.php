@@ -58,7 +58,7 @@
                 {{-- Academics --}}
                 @if (Qs::userIsAcademic())
                     <li
-                        class="nav-item nav-item-submenu {{ in_array(Route::currentRouteName(), ['tt.index', 'ttr.edit', 'ttr.show', 'ttr.manage']) ? 'nav-item-expanded nav-item-open' : '' }} ">
+                        class="nav-item nav-item-submenu {{ in_array(Route::currentRouteName(), ['tt.index', 'ttr.edit', 'ttr.show', 'ttr.manage', 'timetables.import']) ? 'nav-item-expanded nav-item-open' : '' }} ">
                         <a href="#" class="nav-link"><i class="icon-graduation2"></i> <span> Académique</span></a>
 
                         <ul class="nav nav-group-sub" data-submenu-title="Gérer l'académique">
@@ -67,6 +67,13 @@
                             <li class="nav-item"><a href="{{ route('tt.index') }}"
                                     class="nav-link {{ in_array(Route::currentRouteName(), ['tt.index']) ? 'active' : '' }}">Emplois
                                     du temps</a></li>
+
+                            {{-- Import Schedule (teacher + admin only) --}}
+                            @if (Qs::userIsTeamSAT())
+                                <li class="nav-item"><a href="{{ route('timetables.import') }}"
+                                        class="nav-link {{ in_array(Route::currentRouteName(), ['timetables.import']) ? 'active' : '' }}">Importer
+                                        un emploi du temps</a></li>
+                            @endif
                         </ul>
                     </li>
                 @endif

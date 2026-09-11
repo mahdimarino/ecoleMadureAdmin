@@ -93,6 +93,13 @@ Route::group(['middleware' => 'auth'], function () {
             Route::delete('/events/{event_id}', 'CalendarController@destroy')->name('calendar.events.destroy');
         });
 
+        Route::group(['prefix' => 'timetables/import', 'middleware' => 'teamSAT'], function () {
+            Route::get('/', 'CalendarController@importForm')->name('timetables.import');
+          Route::get('/template', 'CalendarController@importTemplate')->name('timetables.import.template');
+           Route::post('/', 'CalendarController@import')->name('timetables.import.store');
+       });
+
+
         /*************** Students *****************/
         Route::group(['prefix' => 'students'], function () {
             Route::get('reset_pass/{st_id}', 'StudentRecordController@reset_pass')->name('st.reset_pass');

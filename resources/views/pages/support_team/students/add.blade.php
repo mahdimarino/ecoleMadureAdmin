@@ -72,34 +72,9 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="nal_id">Nationality: <span class="text-danger">*</span></label>
-                                <select data-placeholder="Choose..." required name="nal_id" id="nal_id" class="select-search form-control">
-                                    <option value=""></option>
-                                    @foreach($nationals as $nal)
-                                        <option {{ (old('nal_id') == $nal->id ? 'selected' : '') }} value="{{ $nal->id }}">{{ $nal->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label for="state_id">State: <span class="text-danger">*</span></label>
-                            <select onchange="getLGA(this.value)" required data-placeholder="Choose.." class="select-search form-control" name="state_id" id="state_id">
-                                <option value=""></option>
-                                @foreach($states as $st)
-                                    <option {{ (old('state_id') == $st->id ? 'selected' : '') }} value="{{ $st->id }}">{{ $st->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label for="lga_id">LGA: <span class="text-danger">*</span></label>
-                            <select required data-placeholder="Select State First" class="select-search form-control" name="lga_id" id="lga_id">
-                                <option value=""></option>
-                            </select>
-                        </div>
+                      <input type="hidden" name="nal_id" id="nal_id" value="3">
+<input type="hidden" name="state_id" id="state_id" value="1">
+<input type="hidden" name="lga_id" id="lga_id" value="13">
                     </div>
                     <div class="row">
 
@@ -175,7 +150,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="col-md-3">
                             <label for="dorm_id">Dormitory: </label>
                             <select data-placeholder="Choose..."  name="dorm_id" id="dorm_id" class="select-search form-control">
@@ -207,7 +182,7 @@
                                 <input type="text" name="adm_no" placeholder="Admission Number" class="form-control" value="{{ old('adm_no') }}">
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </fieldset>
 
             </form>
