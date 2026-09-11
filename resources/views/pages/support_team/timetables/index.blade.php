@@ -10,9 +10,9 @@
 
         <div class="card-body">
             <ul class="nav nav-tabs nav-tabs-highlight">
-                @if(Qs::userIsTeamSA())
+                {{-- @if(Qs::userIsTeamSA())
                 <li class="nav-item"><a href="#add-tt" class="nav-link active" data-toggle="tab">Créer un emploi du temps</a></li>
-                @endif
+                @endif --}}
                 <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Afficher les emplois du temps</a>
                     <div class="dropdown-menu dropdown-menu-right">
@@ -26,7 +26,7 @@
 
             <div class="tab-content">
 
-                @if(Qs::userIsTeamSA())
+                {{-- @if(Qs::userIsTeamSA())
                 <div class="tab-pane fade show active" id="add-tt">
                    <div class="col-md-8">
                        <form class="ajax-store" method="post" action="{{ route('ttr.store') }}">
@@ -69,7 +69,7 @@
                    </div>
 
                 </div>
-                @endif
+                @endif --}}
 
                 @foreach($my_classes as $mc)
                     <div class="tab-pane fade" id="ttr{{ $mc->id }}">                         <table class="table datatable-button-html5-columns">

@@ -32,7 +32,7 @@
     }
 
     .teacher-reg-header {
-        background: #2196f3 !important;
+       
         padding: 25px 30px;
         text-align: center;
     }
@@ -46,14 +46,14 @@
 
     .teacher-reg-header-title {
         margin: 0;
-        color: #ffffff !important;
+        color: #000000 !important;
         font-size: 26px;
         font-weight: 600;
     }
 
     .teacher-reg-header-text {
         margin: 7px 0 0;
-        color: #eaf5ff !important;
+        color: #010101 !important;
         font-size: 14px;
     }
 
@@ -244,7 +244,7 @@
                 utilisé dans votre page de connexion.
             --}}
             <img
-                src="{{ asset('global_assets/images/logo.png') }}"
+                src="https://madaure.vercel.app/assets/images/logo/logo.png"
                 alt="Logo"
                 class="teacher-reg-logo"
                 onerror="this.style.display='none';"
