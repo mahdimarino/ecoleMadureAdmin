@@ -13,6 +13,11 @@ class TimeTableRecord extends Eloquent
         return $this->belongsTo(MyClass::class);
     }
 
+    public function time_tables()
+    {
+        return $this->hasMany(TimeTable::class, 'ttr_id');
+    }
+
     public function exam()
     {
         return $this->belongsTo(Exam::class);

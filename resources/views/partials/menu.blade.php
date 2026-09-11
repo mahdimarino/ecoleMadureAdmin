@@ -263,11 +263,11 @@
                     </li> --}}
 
                     {{-- Manage Subjects --}}
-                    {{-- <li class="nav-item">
+                    <li class="nav-item">
                         <a href="{{ route('subjects.index') }}"
                             class="nav-link {{ in_array(Route::currentRouteName(), ['subjects.index', 'subjects.edit']) ? 'active' : '' }}"><i
                                 class="icon-pin"></i> <span>Matières</span></a>
-                    </li> --}}
+                    </li>
                 @endif
 
                 {{-- Exam --}}

@@ -2,9 +2,53 @@
 
 use Illuminate\Support\Facades\Route; // <- ADD THIS IMPORT AT THE TOP
 use App\Http\Controllers\Admin\NewsController; // <- Import NewsController
-
+use App\Http\Controllers\SupportTeam\TimetableAdminController;
 use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Mail;
+
+Route::get(
+    '/timetable-management',
+    [TimetableAdminController::class, 'index']
+)
+    ->name('admin-timetable.index')
+    ->middleware('teamSA');
+
+
+Route::post(
+    '/timetable-management',
+    [TimetableAdminController::class, 'store']
+)
+    ->name('admin-timetable.store')
+    ->middleware('teamSA');
+
+
+Route::put(
+    '/timetable-management/{id}',
+    [TimetableAdminController::class, 'update']
+)
+    ->name('admin-timetable.update')
+    ->middleware('teamSA');
+
+
+Route::delete(
+    '/timetable-management/{id}',
+    [TimetableAdminController::class, 'destroy']
+)
+    ->name('admin-timetable.destroy')
+    ->middleware('teamSA');
+
+
+/*
+|--------------------------------------------------------------------------
+| Student / Parent
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/my-timetable',
+    [TimetableAdminController::class, 'myTimetable']
+)
+    ->name('my-timetable');
 
 Route::get('/test-email', function () {
 

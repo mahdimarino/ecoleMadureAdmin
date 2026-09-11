@@ -92,7 +92,7 @@
                                     <td>{{ $s->name }} </td>
                                     <td>{{ $s->slug }} </td>
                                     <td>{{ $s->my_class->name }}</td>
-                                    <td>{{ $s->teacher->name }}</td>
+                                    <td>{{ $s->teacher ? $s->teacher->name : 'No teacher yet' }}</td>
                                     <td class="text-center">
                                         <div class="list-icons">
                                             <div class="dropdown">

@@ -37,7 +37,7 @@ class CreateTimeTablesTable extends Migration
             $table->string('time_to', 100);
             $table->string('timestamp_from', 50);
             $table->string('timestamp_to', 50);
-            $table->string('full', 100);
+            $table->string('full', 100)->nullable();
             $table->timestamps();
 
             $table->unique(['timestamp_from', 'timestamp_to', 'ttr_id']);

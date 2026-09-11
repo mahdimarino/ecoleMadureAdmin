@@ -28,11 +28,11 @@
 
             @if($selected_class)
 
-                @if($subjects->isEmpty())
+                {{-- @if($subjects->isEmpty())
                     <div class="alert alert-warning border-0">
                         You don't have any subjects assigned for <strong>{{ $selected_class->name }}</strong>, so there's nothing to import a schedule against yet. Contact an administrator to get assigned to a subject in this class first.
                     </div>
-                @else
+                @else --}}
 
                     <hr>
 
@@ -78,7 +78,7 @@
                         </div>
                     @endif
 
-                @endif
+                {{-- @endif --}}
 
             @endif
 
