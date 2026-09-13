@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\NewsController; // <- Import NewsController
 use App\Http\Controllers\SupportTeam\TimetableAdminController;
 use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\CourseMaterialController;
 
 Route::get(
     '/timetable-management',
@@ -201,6 +202,56 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::delete('/{ts}', 'TimeTableController@delete_time_slot')->name('ts.destroy');
                 Route::put('/{ts}', 'TimeTableController@update_time_slot')->name('ts.update');
             });
+        });
+
+        Route::group(['middleware' => 'auth'], function () {
+
+            // Teacher
+            // Course Materials
+            Route::get('/teacher/course-materials', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@teacherIndex',
+                'as' => 'teacher.course_materials'
+            ]);
+
+            Route::get('/teacher/course-materials/create', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@create',
+                'as' => 'teacher.course_materials.create'
+            ]);
+
+            Route::post('/teacher/course-materials', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@store',
+                'as' => 'teacher.course_materials.store'
+            ]);
+
+            Route::get('/teacher/course-materials/{id}/edit', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@edit',
+                'as' => 'teacher.course_materials.edit'
+            ]);
+
+            Route::put('/teacher/course-materials/{id}', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@update',
+                'as' => 'teacher.course_materials.update'
+            ]);
+
+            Route::delete('/teacher/course-materials/{id}', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@destroy',
+                'as' => 'teacher.course_materials.destroy'
+            ]);
+
+            Route::get('/course-materials', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@studentIndex',
+                'as' => 'course_materials'
+            ]);
+
+            Route::get('/parent/course-materials', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@parentIndex',
+                'as' => 'parent.course_materials'
+            ]);
+
+            Route::get('/course-materials/{id}/download', [
+                'uses' => '\App\Http\Controllers\CourseMaterialController@download',
+                'as' => 'course_materials.download'
+            ]);
         });
 
         /*************** Payments *****************/

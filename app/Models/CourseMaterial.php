@@ -1,10 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\User;
+use Eloquent;
 
-class CourseMaterial extends Model
+class CourseMaterial extends Eloquent
 {
     protected $fillable = [
         'title',
@@ -20,5 +21,10 @@ class CourseMaterial extends Model
     public function teacher()
     {
         return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function my_class()
+    {
+        return $this->belongsTo(MyClass::class, 'class_id');
     }
 }
