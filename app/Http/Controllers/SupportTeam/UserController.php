@@ -8,6 +8,7 @@ use App\Http\Requests\UserRequest;
 use App\Repositories\LocationRepo;
 use App\Repositories\MyClassRepo;
 use App\Repositories\UserRepo;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -133,6 +134,18 @@ class UserController extends Controller
         return redirect()
             ->route('teacherregrstarsion')
             ->with('success', 'Teacher registration successful!');
+    }
+
+    public function approveTeacher(User $user)
+    {
+        if ($user->user_type !== 'teacher') {
+            abort(404);
+        }
+
+        $user->is_approved = true;
+        $user->save();
+
+        return back()->with('success', 'Teacher approved successfully.');
     }
 
     public function teacherRegistration()

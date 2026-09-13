@@ -100,6 +100,7 @@ Route::group(['middleware' => 'auth'], function () {
 | Student Applications
 |--------------------------------------------------------------------------
 */
+       
 
         Route::group(['prefix' => 'student-applications'], function () {
 
@@ -163,6 +164,8 @@ Route::group(['middleware' => 'auth'], function () {
         /*************** Users *****************/
         Route::group(['prefix' => 'users'], function () {
             Route::get('reset_pass/{id}', 'UserController@reset_pass')->name('users.reset_pass');
+            Route::patch('approve-teacher/{user}', 'UserController@approveTeacher')
+                ->name('users.approveTeacher');
         });
 
         /*************** TimeTables *****************/
