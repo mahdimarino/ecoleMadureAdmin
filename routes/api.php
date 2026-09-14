@@ -5,11 +5,13 @@ use App\Http\Controllers\ContactController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\StudentApplicationController;
+use App\Http\Controllers\Api\TeacherController;
 
 Route::get('/news', [NewsController::class, 'index']);
 Route::get('/news/featured', [NewsController::class, 'featured']);
 Route::get('/news/{slug}', [NewsController::class, 'show']);
 Route::post('/contact', [ContactController::class, 'contactUs']);
+Route::get('/teachers', [TeacherController::class, 'index']);
 
 Route::post(
     '/student-applications',
