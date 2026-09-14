@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Qs;
 use App\Models\CourseMaterial;
 use App\Models\MyClass;
 use Illuminate\Http\Request;
@@ -15,12 +16,18 @@ class CourseMaterialController extends Controller
      */
     public function teacherIndex()
     {
-        $teacher = Auth::user();
+        $user = Auth::user();
 
-        $materials = CourseMaterial::where('teacher_id', $teacher->id)
-            ->with('my_class')
-            ->latest()
-            ->get();
+        if (Qs::userIsTeamSA()) {
+            $materials = CourseMaterial::with('my_class')
+                ->latest()
+                ->get();
+        } else {
+            $materials = CourseMaterial::where('teacher_id', $user->id)
+                ->with('my_class')
+                ->latest()
+                ->get();
+        }
 
         $classes = MyClass::orderBy('name')->get();
 
@@ -106,8 +113,13 @@ class CourseMaterialController extends Controller
     {
         $material = CourseMaterial::findOrFail($id);
 
-        // Only the teacher who uploaded it can update it
-        if ($material->teacher_id != Auth::id()) {
+        $user = Auth::user();
+
+        // Only the teacher who uploaded it, or an admin/super_admin, can update it
+        if (
+            $material->teacher_id != $user->id &&
+            !in_array($user->user_type, ['admin', 'super_admin'])
+        ) {
             abort(403);
         }
 
@@ -140,7 +152,7 @@ class CourseMaterialController extends Controller
             $file = $request->file('file');
 
             $path = $file->store(
-                'course_materials/' . Auth::id(),
+                'course_materials/' . $material->teacher_id,
                 'local'
             );
 
@@ -167,7 +179,12 @@ class CourseMaterialController extends Controller
     {
         $material = CourseMaterial::findOrFail($id);
 
-        if ($material->teacher_id != Auth::id()) {
+        $user = Auth::user();
+
+        if (
+            $material->teacher_id != $user->id &&
+            !in_array($user->user_type, ['admin', 'super_admin'])
+        ) {
             abort(403);
         }
 
@@ -296,6 +313,9 @@ class CourseMaterialController extends Controller
                 abort(403);
             }
 
+            return $this->sendFile($material);
+        }
+        if (in_array($user->user_type, ['admin', 'super_admin'])) {
             return $this->sendFile($material);
         }
 

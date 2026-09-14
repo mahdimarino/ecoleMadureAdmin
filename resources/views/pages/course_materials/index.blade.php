@@ -74,7 +74,7 @@
 
                             <div class="card-footer bg-white">
 
-                                <a href="{{ route('course_materials.download', $material->id) }}"
+                                <a href="{{ route('course_materials.download', ['id' => Qs::hash($material->id)]) }}"
                                    class="btn btn-primary btn-block"
                                    target="_blank">
 

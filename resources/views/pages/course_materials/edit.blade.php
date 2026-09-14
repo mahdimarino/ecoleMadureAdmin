@@ -25,7 +25,7 @@
             </div>
         @endif
 
-        <form action="{{ route('teacher.course_materials.update', $material->id) }}"
+        <form action="{{ route('teacher.course_materials.update', Qs::hash($material->id)) }}"
               method="POST"
               enctype="multipart/form-data">
 

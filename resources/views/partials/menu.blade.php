@@ -236,40 +236,60 @@
                                 {{-- End Exam --}}
 
                 {{-- Course Materials --}}
-                @if (Qs::userIsTeacher())
-                    <li class="nav-item">
-                        <a href="{{ route('teacher.course_materials') }}"
-                            class="nav-link {{ in_array(Route::currentRouteName(), [
-                                'teacher.course_materials',
-                                'teacher.course_materials.create',
-                                'teacher.course_materials.edit'
-                            ]) ? 'active' : '' }}">
+              {{-- Course Materials --}}
 
-                            <i class="icon-book"></i>
-                            <span>Supports de cours</span>
-                        </a>
-                    </li>
+@if (Qs::userIsTeamSA())
+    {{-- Admin / Super Admin --}}
+    <li class="nav-item">
+        <a href="{{ route('teacher.course_materials') }}"
+            class="nav-link {{ in_array(Route::currentRouteName(), [
+                'teacher.course_materials',
+                'teacher.course_materials.create',
+                'teacher.course_materials.edit'
+            ]) ? 'active' : '' }}">
 
-                @elseif (Qs::userIsStudent())
-                    <li class="nav-item">
-                        <a href="{{ route('course_materials') }}"
-                            class="nav-link {{ Route::is('course_materials') ? 'active' : '' }}">
+            <i class="icon-book"></i>
+            <span>Supports de cours</span>
+        </a>
+    </li>
 
-                            <i class="icon-book"></i>
-                            <span>Supports de cours</span>
-                        </a>
-                    </li>
+@elseif (Qs::userIsTeacher())
+    {{-- Teacher --}}
+    <li class="nav-item">
+        <a href="{{ route('teacher.course_materials') }}"
+            class="nav-link {{ in_array(Route::currentRouteName(), [
+                'teacher.course_materials',
+                'teacher.course_materials.create',
+                'teacher.course_materials.edit'
+            ]) ? 'active' : '' }}">
 
-                @elseif (Qs::userIsParent())
-                    <li class="nav-item">
-                        <a href="{{ route('parent.course_materials') }}"
-                            class="nav-link {{ Route::is('parent.course_materials') ? 'active' : '' }}">
+            <i class="icon-book"></i>
+            <span>Supports de cours</span>
+        </a>
+    </li>
 
-                            <i class="icon-book"></i>
-                            <span>Supports de cours</span>
-                        </a>
-                    </li>
-                @endif
+@elseif (Qs::userIsStudent())
+    {{-- Student --}}
+    <li class="nav-item">
+        <a href="{{ route('course_materials') }}"
+            class="nav-link {{ Route::is('course_materials') ? 'active' : '' }}">
+
+            <i class="icon-book"></i>
+            <span>Supports de cours</span>
+        </a>
+    </li>
+
+@elseif (Qs::userIsParent())
+    {{-- Parent --}}
+    <li class="nav-item">
+        <a href="{{ route('parent.course_materials') }}"
+            class="nav-link {{ Route::is('parent.course_materials') ? 'active' : '' }}">
+
+            <i class="icon-book"></i>
+            <span>Supports de cours</span>
+        </a>
+    </li>
+@endif
 
                 @include('pages.' . Qs::getUserType() . '.menu')
 

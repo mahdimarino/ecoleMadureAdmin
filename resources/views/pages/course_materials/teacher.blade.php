@@ -79,18 +79,18 @@
 
                                 <td>
 
-                                    <a href="{{ route('course_materials.download', $material->id) }}"
-                                       class="btn btn-sm btn-info"
-                                       target="_blank">
-                                        <i class="icon-eye"></i>
-                                    </a>
+                                    <a href="{{ route('course_materials.download', Qs::hash($material->id)) }}"
+   class="btn btn-sm btn-info"
+   target="_blank">
+    <i class="icon-eye"></i>
+</a>
 
-                                   <a href="{{ route('teacher.course_materials.edit', ['id' => $material->id]) }}"
+                                  <a href="{{ route('teacher.course_materials.edit', ['id' => Qs::hash($material->id)]) }}"
    class="btn btn-sm btn-warning">
     <i class="icon-pencil"></i>
 </a>
 
-                                    <form action="{{ route('teacher.course_materials.destroy', $material->id) }}"
+                                    <form action="{{ route('teacher.course_materials.destroy', ['id' => Qs::hash($material->id)]) }}"
                                           method="POST"
                                           style="display:inline-block;"
                                           onsubmit="return confirm('Are you sure you want to delete this material?');">
