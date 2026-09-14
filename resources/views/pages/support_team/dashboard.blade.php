@@ -1,3 +1,4 @@
+
 @extends('layouts.master')
 @section('page_title', 'Mon Tableau de bord')
 @section('content')
@@ -67,36 +68,35 @@
     @endif
 
     {{-- Events Calendar Begins --}}
-        {{--Events Calendar Begins--}}
-   <div class="card">
-    <div class="card-header header-elements-inline">
-        <h5 class="card-title">Calendrier des événements scolaires</h5>
-        {!! Qs::getPanelOptions() !!}
+    <div class="card">
+        <div class="card-header header-elements-inline">
+            <h5 class="card-title">Calendrier des événements scolaires</h5>
+            {!! Qs::getPanelOptions() !!}
+        </div>
+
+        <div class="card-body">
+
+            @if ($calendar_classes->count())
+                <div class="form-group" style="max-width: 320px;">
+                    <label>Classe</label>
+
+                    <select id="calendar_class_filter" class="form-control select">
+
+                        @if (Qs::userIsTeamSAT() || $calendar_classes->count() > 1)
+                            <option value="">Toutes les classes</option>
+                        @endif
+
+                        @foreach ($calendar_classes as $class)
+                            <option value="{{ $class->id }}">{{ $class->name }}</option>
+                        @endforeach
+
+                    </select>
+                </div>
+            @endif
+
+            <div class="school-calendar"></div>
+        </div>
     </div>
-
-    <div class="card-body">
-
-        @if($calendar_classes->count())
-            <div class="form-group" style="max-width: 320px;">
-                <label>Classe</label>
-
-                <select id="calendar_class_filter" class="form-control select">
-
-                    @if(Qs::userIsTeamSAT() || $calendar_classes->count() > 1)
-                        <option value="">Toutes les classes</option>
-                    @endif
-
-                    @foreach($calendar_classes as $class)
-                        <option value="{{ $class->id }}">{{ $class->name }}</option>
-                    @endforeach
-
-                </select>
-            </div>
-        @endif
-
-        <div class="school-calendar"></div>
-    </div>
-</div>
 
     <!-- Calendar Modal -->
     <div class="modal fade" id="calendarEventModal" tabindex="-1">
@@ -185,7 +185,8 @@
                                 <select name="subject_id" id="calendar_subject_id" class="form-control" required>
 
                                     @foreach ($calendar_subjects as $subject)
-                                        <option value="{{ $subject->id }}" data-class="{{ $subject->my_class_id }}">
+                                        <option value="{{ $subject->id }}"
+                                            data-class="{{ $subject->my_class_id }}">
 
                                             {{ $subject->name }}
 
@@ -196,19 +197,16 @@
                             </div>
 
 
+                            {{-- EXAM NAME --}}
                             <div class="form-group" id="calendar_exam_group" style="display:none;">
 
                                 <label>Examen</label>
 
-                                <select name="exam_id" id="calendar_exam_id" class="form-control">
-
-                                    @foreach ($calendar_exams as $exam)
-                                        <option value="{{ $exam->id }}">
-                                            {{ $exam->name }}
-                                        </option>
-                                    @endforeach
-
-                                </select>
+                                <input type="text"
+                                    name="exam_name"
+                                    id="calendar_exam_name"
+                                    class="form-control"
+                                    placeholder="Exemple : Examen de Mathématiques">
 
                             </div>
 
@@ -217,7 +215,11 @@
 
                                 <label>Date</label>
 
-                                <input type="date" name="date" id="calendar_date" class="form-control" required>
+                                <input type="date"
+                                    name="date"
+                                    id="calendar_date"
+                                    class="form-control"
+                                    required>
 
                             </div>
 
@@ -230,8 +232,11 @@
 
                                         <label>Début</label>
 
-                                        <input type="time" name="start_time" id="calendar_start_time"
-                                            class="form-control" required>
+                                        <input type="time"
+                                            name="start_time"
+                                            id="calendar_start_time"
+                                            class="form-control"
+                                            required>
 
                                     </div>
 
@@ -244,8 +249,11 @@
 
                                         <label>Fin</label>
 
-                                        <input type="time" name="end_time" id="calendar_end_time"
-                                            class="form-control" required>
+                                        <input type="time"
+                                            name="end_time"
+                                            id="calendar_end_time"
+                                            class="form-control"
+                                            required>
 
                                     </div>
 
@@ -256,11 +264,14 @@
 
                             <div class="text-right">
 
-                                <button type="button" class="btn btn-light" id="calendarBackBtn">
+                                <button type="button"
+                                    class="btn btn-light"
+                                    id="calendarBackBtn">
                                     Retour
                                 </button>
 
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit"
+                                    class="btn btn-primary">
                                     Enregistrer
                                 </button>
 
@@ -283,77 +294,99 @@
 
             var calendar = $('.school-calendar');
 
-    var canManage = @json(Qs::userIsTeamSAT());
+            var canManage = @json(Qs::userIsTeamSAT());
 
-    var baseUrl = "{{ url('/calendar/events') }}";
+            var baseUrl = "{{ url('/calendar/events') }}";
 
-    var classFilter = $('#calendar_class_filter');
+            var classFilter = $('#calendar_class_filter');
 
-    var classes = @json(
-        $calendar_classes->map(function($class) {
-            return [
-                'id' => $class->id,
-                'name' => $class->name
-            ];
-        })->values()
-    );
+          var classes = {!! $calendar_classes->map(function ($class) {
+    return [
+        'id' => $class->id,
+        'name' => $class->name,
+    ];
+})->values()->toJson() !!};
 
-    var subjects = @json(
-        $calendar_subjects->map(function($subject) {
-            return [
-                'id' => $subject->id,
-                'name' => $subject->name,
-                'class_id' => $subject->my_class_id
-            ];
-        })->values()
-    );
+var subjects = {!! $calendar_subjects->map(function ($subject) {
+    return [
+        'id' => $subject->id,
+        'name' => $subject->name,
+        'class_id' => $subject->my_class_id,
+    ];
+})->values()->toJson() !!};
 
 
-    calendar.fullCalendar({
+           calendar.fullCalendar({
 
-        header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'month,basicWeek,basicDay'
-        },
+    header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,basicWeek,basicDay'
+    },
 
-        defaultView: 'month',
+    defaultView: 'month',
 
-        editable: false,
+    editable: false,
 
-        eventLimit: true,
+    eventLimit: true,
 
-        events: {
-            url: "{{ route('calendar.events') }}",
-            data: function() {
-                return { class_id: classFilter.val() || '' };
+    events: {
+        url: "{{ route('calendar.events') }}",
+        data: function() {
+            return {
+                class_id: classFilter.val() || ''
+            };
+        }
+    },
+
+    eventAfterAllRender: function() {
+
+        // Reset all days first
+        $('.fc-day').css('background-color', '');
+
+        var events = calendar.fullCalendar('clientEvents');
+
+        events.forEach(function(event) {
+
+            var props = event.extendedProps;
+
+            // Only exams make the whole day yellow
+            if (props.type !== 'exam') {
+                return;
             }
-        },
 
-        dayClick: function(date) {
-            openDayModal(date.format('YYYY-MM-DD'));
-        },
+            var date = moment(event.start).format('YYYY-MM-DD');
 
-      eventClick: function(event) {
-    var props = event.extendedProps;
-
-    if (!props.row_id) {
-        alert('TimeTable ID is missing.');
-        return;
-    }
-
-    // Parent and student are read-only
-    if (!canManage) {
-        return;
-    }
-
-    openEventModal(event);
-},
-
-        isRTL: $('html').attr('dir') === 'rtl'
-
+            $('.fc-day[data-date="' + date + '"]').css({
+                'background-color': '#fff3cd'
             });
 
+        });
+    },
+
+    dayClick: function(date) {
+        openDayModal(date.format('YYYY-MM-DD'));
+    },
+
+    eventClick: function(event) {
+
+        var props = event.extendedProps;
+
+        if (!props.row_id) {
+            alert('TimeTable ID is missing.');
+            return;
+        }
+
+        if (!canManage) {
+            return;
+        }
+
+        openEventModal(event);
+    },
+
+    isRTL: $('html').attr('dir') === 'rtl'
+
+});
 
             /*
             |--------------------------------------------------------------------------
@@ -395,20 +428,21 @@
                 var events = calendar.fullCalendar('clientEvents');
 
                 var dayEvents = events.filter(function(event) {
-    return moment(event.start).format('YYYY-MM-DD') === date;
-});
+                    return moment(event.start).format('YYYY-MM-DD') === date;
+                });
 
-// Show exams first, then normal schedule
-dayEvents.sort(function(a, b) {
-    var aIsExam = a.extendedProps.type === 'exam';
-    var bIsExam = b.extendedProps.type === 'exam';
+                // Show exams first, then normal schedule
+                dayEvents.sort(function(a, b) {
 
-    if (aIsExam && !bIsExam) return -1;
-    if (!aIsExam && bIsExam) return 1;
+                    var aIsExam = a.extendedProps.type === 'exam';
+                    var bIsExam = b.extendedProps.type === 'exam';
 
-    // If same type, sort by start time
-    return moment(a.start).valueOf() - moment(b.start).valueOf();
-});
+                    if (aIsExam && !bIsExam) return -1;
+                    if (!aIsExam && bIsExam) return 1;
+
+                    return moment(a.start).valueOf() - moment(b.start).valueOf();
+
+                });
 
 
                 if (!dayEvents.length) {
@@ -479,6 +513,7 @@ dayEvents.sort(function(a, b) {
                         '</div>' +
                         '</div>' +
                         '</div>';
+
                 });
 
 
@@ -515,8 +550,11 @@ dayEvents.sort(function(a, b) {
                 resetForm();
 
                 if (classFilter.val()) {
+
                     $('#calendar_class_id').val(classFilter.val());
+
                     filterSubjects();
+
                 }
 
                 var date = $('#selectedCalendarDate')
@@ -524,15 +562,11 @@ dayEvents.sort(function(a, b) {
 
                 if (!date) {
 
-                    var text = $('#selectedCalendarDate').text();
-
                     date = moment().format('YYYY-MM-DD');
 
                 }
 
-                $('#calendar_date').val(
-                    $('#selectedCalendarDate').data('date')
-                );
+                $('#calendar_date').val(date);
 
                 $('#calendarModalTitle').text(
                     'Ajouter un événement'
@@ -569,13 +603,16 @@ dayEvents.sort(function(a, b) {
 
                     $('#calendar_exam_group').show();
 
-                    $('#calendar_exam_id').prop('required', true);
+                    $('#calendar_exam_name')
+                        .prop('required', true);
 
                 } else {
 
                     $('#calendar_exam_group').hide();
 
-                    $('#calendar_exam_id').prop('required', false);
+                    $('#calendar_exam_name')
+                        .prop('required', false)
+                        .val('');
 
                 }
 
@@ -664,30 +701,45 @@ dayEvents.sort(function(a, b) {
 
                     error: function(xhr) {
 
-                        console.log('Calendar update error:', xhr);
-                        console.log('Response:', xhr.responseJSON);
+                        console.log(
+                            'Calendar update error:',
+                            xhr
+                        );
+
+                        console.log(
+                            'Response:',
+                            xhr.responseJSON
+                        );
 
                         var message = 'Une erreur est survenue.';
 
                         if (xhr.responseJSON) {
 
                             if (xhr.responseJSON.msg) {
+
                                 message = xhr.responseJSON.msg;
+
                             } else if (xhr.responseJSON.message) {
+
                                 message = xhr.responseJSON.message;
+
                             } else if (xhr.responseJSON.errors) {
 
-                                message = Object.values(xhr.responseJSON.errors)
+                                message = Object.values(
+                                        xhr.responseJSON.errors
+                                    )
                                     .flat()
                                     .join('<br>');
 
                             }
+
                         }
 
                         flash({
                             msg: message,
                             type: 'danger'
                         });
+
                     }
 
                 });
@@ -741,16 +793,22 @@ dayEvents.sort(function(a, b) {
                 $('#calendar_end_time')
                     .val(moment(event.end).format('HH:mm'));
 
+
                 if (props.type === 'exam') {
 
                     $('#calendar_exam_group').show();
 
-                    $('#calendar_exam_id')
-                        .val(props.exam_id);
+                    $('#calendar_exam_name')
+                        .val(props.exam_name)
+                        .prop('required', true);
 
                 } else {
 
                     $('#calendar_exam_group').hide();
+
+                    $('#calendar_exam_name')
+                        .val('')
+                        .prop('required', false);
 
                 }
 
@@ -792,8 +850,10 @@ dayEvents.sort(function(a, b) {
                 $('#calendar_class_id')
                     .prop('disabled', false);
 
-                $('#calendar_exam_id')
-                    .prop('disabled', false);
+                $('#calendar_exam_name')
+                    .prop('disabled', false)
+                    .prop('required', false)
+                    .val('');
 
                 $('#calendar_exam_group').hide();
 
@@ -805,6 +865,8 @@ dayEvents.sort(function(a, b) {
 
             }
 
+
+            
 
             /*
             |--------------------------------------------------------------------------
@@ -824,5 +886,6 @@ dayEvents.sort(function(a, b) {
     </script>
 
 @endsection
+
 {{-- Events Calendar Ends --}}
 @endsection

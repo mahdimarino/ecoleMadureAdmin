@@ -54,16 +54,38 @@ class UserController extends Controller
         return view('pages.support_team.users.edit', $d);
     }
 
-    public function reset_pass($id)
+    public function reset_pass(Request $request)
     {
-        // Redirect if Making Changes to Head of Super Admins
-        if(Qs::headSA($id)){
+        $request->validate([
+            'user_id' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $id = Qs::decodeHash($request->user_id);
+
+        if (!$id) {
+            return back()->with('pop_error', 'Utilisateur invalide.');
+        }
+
+        // Prevent changes to Head Super Admin
+        if (Qs::headSA($id)) {
             return back()->with('flash_danger', __('msg.denied'));
         }
 
-        $data['password'] = Hash::make('user');
-        $this->user->update($id, $data);
-        return back()->with('flash_success', __('msg.pu_reset'));
+        $user = $this->user->find($id);
+
+        if (!$user) {
+            return back()->with('pop_error', 'Utilisateur introuvable.');
+        }
+
+        $this->user->update($id, [
+            'password' => Hash::make($request->password)
+        ]);
+
+        return back()->with(
+            'flash_success',
+            'Le mot de passe a été modifié avec succès.'
+        );
     }
 
     public function registerTeacher(Request $req)

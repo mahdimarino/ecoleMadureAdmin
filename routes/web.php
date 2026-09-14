@@ -148,7 +148,8 @@ Route::group(['middleware' => 'auth'], function () {
 
         /*************** Students *****************/
         Route::group(['prefix' => 'students'], function () {
-            Route::get('reset_pass/{st_id}', 'StudentRecordController@reset_pass')->name('st.reset_pass');
+            Route::post('reset_pass', 'StudentRecordController@reset_pass')->name('st.reset_pass');
+            
             Route::get('graduated', 'StudentRecordController@graduated')->name('students.graduated');
             Route::put('not_graduated/{id}', 'StudentRecordController@not_graduated')->name('st.not_graduated');
             Route::get('list/{class_id}', 'StudentRecordController@listByClass')->name('students.list')->middleware('teamSAT');
@@ -164,7 +165,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         /*************** Users *****************/
         Route::group(['prefix' => 'users'], function () {
-            Route::get('reset_pass/{id}', 'UserController@reset_pass')->name('users.reset_pass');
+            Route::post('reset_pass', 'UserController@reset_pass')->name('users.reset_pass');
             Route::patch('approve-teacher/{user}', 'UserController@approveTeacher')
                 ->name('users.approveTeacher');
         });

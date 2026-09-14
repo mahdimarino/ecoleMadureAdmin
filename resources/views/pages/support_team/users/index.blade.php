@@ -644,13 +644,14 @@
                                                     @if(Qs::userIsSuperAdmin())
 
                                                         {{-- Reset Password --}}
-                                                        <a href="{{ route('users.reset_pass', Qs::hash($u->id)) }}"
-                                                           class="dropdown-item">
-
-                                                            <i class="icon-lock"></i>
-                                                            Reset password
-
-                                                        </a>
+                                                    <a href="#"
+   class="dropdown-item"
+   data-toggle="modal"
+   data-target="#resetUserPasswordModal"
+   data-user-id="{{ Qs::hash($u->id) }}"
+   data-user-name="{{ $u->name }}">
+    <i class="icon-lock"></i> Reset password
+</a>
 
 
                                                         {{-- Delete --}}
@@ -703,5 +704,92 @@
 
 </div>
 
+<div class="modal fade" id="resetUserPasswordModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <form method="POST" action="{{ route('users.reset_pass') }}">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Réinitialiser le mot de passe
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="user_id" id="reset_user_id">
+
+                    <div class="form-group">
+                        <label>Utilisateur :</label>
+                        <strong id="reset_user_name"></strong>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Nouveau mot de passe :
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Nouveau mot de passe"
+                            required
+                            minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Confirmer le mot de passe :
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            class="form-control"
+                            placeholder="Confirmer le mot de passe"
+                            required
+                            minlength="6">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-light" data-dismiss="modal">
+                        Annuler
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="icon-lock"></i>
+                        Modifier le mot de passe
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#resetUserPasswordModal').on('show.bs.modal', function (event) {
+
+        var button = $(event.relatedTarget);
+
+        $('#reset_user_id').val(button.data('user-id'));
+        $('#reset_user_name').text(button.data('user-name'));
+
+    });
+</script>
 
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\SupportTeam;
 
+use Illuminate\Http\Request;
 use App\Helpers\Qs;
 use App\Helpers\Mk;
 use App\Http\Requests\Student\StudentRecordCreate;
@@ -31,12 +32,24 @@ class StudentRecordController extends Controller
         $this->student = $student;
    }
 
-    public function reset_pass($st_id)
+    public function reset_pass(Request $request)
     {
-        $st_id = Qs::decodeHash($st_id);
-        $data['password'] = Hash::make('student');
-        $this->user->update($st_id, $data);
-        return back()->with('flash_success', __('msg.p_reset'));
+        $request->validate([
+            'user_id' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user_id = Qs::decodeHash($request->user_id);
+
+        if (!$user_id) {
+            return back()->with('pop_error', 'Invalid student.');
+        }
+
+        $data['password'] = Hash::make($request->password);
+
+        $this->user->update($user_id, $data);
+
+        return back()->with('flash_success', 'Student password has been changed successfully.');
     }
 
     public function create()
@@ -61,7 +74,7 @@ class StudentRecordController extends Controller
         $data['user_type'] = 'student';
         $data['name'] = ucwords($req->name);
         $data['code'] = strtoupper(Str::random(10));
-        $data['password'] = Hash::make('student');
+        $data['password'] = Hash::make($req->password);
         $data['photo'] = Qs::getDefaultUserImage();
         $adm_no = $req->adm_no;
         $data['username'] = strtoupper(Qs::getAppCode().'/'.$ct.'/'.$sr['year_admitted'].'/'.($adm_no ?: mt_rand(1000, 99999)));

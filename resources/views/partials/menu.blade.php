@@ -69,7 +69,7 @@
                                     du temps</a></li>
 
                             {{-- Import Schedule (teacher + admin only) --}}
-                            @if (Qs::userIsTeamSAT())
+                            @if (Qs::userIsTeamSA())
                                 <li class="nav-item"><a href="{{ route('timetables.import') }}"
                                         class="nav-link {{ in_array(Route::currentRouteName(), ['timetables.import']) ? 'active' : '' }}">Importer
                                         un emploi du temps</a></li>
@@ -205,8 +205,8 @@
                                 </ul>
                             </li>
 
-                            @if (Qs::userIsTeamSA())
-                                {{-- Student Promotion --}}
+                            {{-- @if (Qs::userIsTeamSA())
+                               
                                 <li
                                     class="nav-item nav-item-submenu {{ in_array(Route::currentRouteName(), ['students.promotion', 'students.promotion_manage']) ? 'nav-item-expanded' : '' }}">
                                     <a href="#"
@@ -223,11 +223,11 @@
 
                                 </li>
 
-                                {{-- Student Graduated --}}
+                               
                                 <li class="nav-item"><a href="{{ route('students.graduated') }}"
                                         class="nav-link {{ in_array(Route::currentRouteName(), ['students.graduated']) ? 'active' : '' }}">Étudiants
                                         diplômés</a></li>
-                            @endif
+                            @endif --}}
 
                         </ul>
                     </li>
@@ -333,7 +333,7 @@
                 @endif
 
                 {{-- Exam --}}
-                @if (Qs::userIsTeamSAT())
+               @if (Qs::userIsTeamSA())
                     <li
                         class="nav-item nav-item-submenu {{ in_array(Route::currentRouteName(), ['exams.index', 'exams.edit', 'grades.index', 'grades.edit', 'marks.index', 'marks.manage', 'marks.bulk', 'marks.tabulation', 'marks.show', 'marks.batch_fix']) ? 'nav-item-expanded nav-item-open' : '' }} ">
                         <a href="#" class="nav-link"><i class="icon-books"></i> <span> Examens</span></a>

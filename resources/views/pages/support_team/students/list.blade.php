@@ -30,7 +30,7 @@
                             <th>Photo</th>
                             <th>Name</th>
                             <th>ADM_No</th>
-                            <th>Section</th>
+                            {{-- <th>Section</th> --}}
                             <th>Email</th>
                             <th>Action</th>
                         </tr>
@@ -42,7 +42,7 @@
                                 <td><img class="rounded-circle" style="height: 40px; width: 40px;" src="{{ $s->user->photo }}" alt="photo"></td>
                                 <td>{{ $s->user->name }}</td>
                                 <td>{{ $s->adm_no }}</td>
-                                <td>{{ $my_class->name.' '.$s->section->name }}</td>
+                                {{-- <td>{{ $my_class->name.' '.$s->section->name }}</td> --}}
                                 <td>{{ $s->user->email }}</td>
                                 <td class="text-center">
                                     <div class="list-icons">
@@ -55,9 +55,16 @@
                                                 <a href="{{ route('students.show', Qs::hash($s->id)) }}" class="dropdown-item"><i class="icon-eye"></i> View Profile</a>
                                                 @if(Qs::userIsTeamSA())
                                                     <a href="{{ route('students.edit', Qs::hash($s->id)) }}" class="dropdown-item"><i class="icon-pencil"></i> Edit</a>
-                                                    <a href="{{ route('st.reset_pass', Qs::hash($s->user->id)) }}" class="dropdown-item"><i class="icon-lock"></i> Reset password</a>
+                                                   <a href="#"
+   class="dropdown-item"
+   data-toggle="modal"
+   data-target="#resetPasswordModal"
+   data-user-id="{{ Qs::hash($s->user->id) }}"
+   data-user-name="{{ $s->user->name }}">
+    <i class="icon-lock"></i> Reset password
+</a>
                                                 @endif
-                                                <a target="_blank" href="{{ route('marks.year_selector', Qs::hash($s->user->id)) }}" class="dropdown-item"><i class="icon-check"></i> Marksheet</a>
+                                                {{-- <a target="_blank" href="{{ route('marks.year_selector', Qs::hash($s->user->id)) }}" class="dropdown-item"><i class="icon-check"></i> Marksheet</a> --}}
 
                                                 {{--Delete--}}
                                                 @if(Qs::userIsSuperAdmin())
@@ -132,5 +139,97 @@
     </div>
 
     {{--Student List Ends--}}
+
+    {{-- Reset Password Modal --}}
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <form method="POST" action="{{ route('st.reset_pass') }}">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">
+                        Reset Student Password
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="user_id" id="reset_user_id">
+
+                    <div class="mb-3">
+                        <strong>Student:</strong>
+                        <span id="reset_student_name"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            New Password:
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="reset_password"
+                            class="form-control"
+                            placeholder="Enter new password"
+                            required
+                            minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Confirm Password:
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            class="form-control"
+                            placeholder="Confirm new password"
+                            required
+                            minlength="6">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="icon-lock"></i>
+                        Change Password
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#resetPasswordModal').on('show.bs.modal', function (event) {
+
+        var button = $(event.relatedTarget);
+
+        var userId = button.data('user-id');
+        var userName = button.data('user-name');
+
+        $('#reset_user_id').val(userId);
+        $('#reset_student_name').text(userName);
+
+        $('#reset_password').val('');
+    });
+</script>
 
 @endsection

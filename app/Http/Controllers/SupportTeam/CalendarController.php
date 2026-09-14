@@ -34,8 +34,7 @@ class CalendarController extends Controller
         $query = TimeTable::with([
             'subject',
             'time_slot',
-            'tt_record.my_class',
-            'tt_record.exam'
+            'tt_record.my_class'
         ]);
 
         // Requested class filter (from the "Classe" selector above the calendar)
@@ -148,7 +147,7 @@ class CalendarController extends Controller
                     $date->format('Y-m-d') . ' ' . $row->time_slot->time_to
                 );
 
-                $examName = optional($row->tt_record->exam)->name ?? 'Exam';
+                $examName = $row->tt_record->exam_name ?? 'Exam';
 
                 $events[] = [
                     'id' => 'exam-' . $row->id,
@@ -166,7 +165,7 @@ class CalendarController extends Controller
                         'class_name' => $className,
                         'subject_id' => $row->subject_id,
                         'subject_name' => $subjectName,
-                        'exam_id' => $row->tt_record->exam_id,
+                        'exam_id' => null,
                         'exam_name' => $examName,
                     ],
                 ];
@@ -244,7 +243,7 @@ class CalendarController extends Controller
             'date'       => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_time'   => 'required|date_format:H:i|after:start_time',
-            'exam_id'    => 'nullable|exists:exams,id',
+            'exam_name' => 'nullable|string|max:255',
         ]);
 
         $this->checkCreatePermission(
@@ -252,13 +251,12 @@ class CalendarController extends Controller
             $request->subject_id
         );
 
-        if ($request->type === 'exam' && !$request->exam_id) {
+        if ($request->type === 'exam' && !$request->filled('exam_name')) {
             return response()->json([
                 'ok' => false,
-                'msg' => 'Please select an exam.'
+                'msg' => 'Please enter an exam name.'
             ], 422);
         }
-
         $year = Qs::getCurrentSession();
 
         DB::transaction(function () use ($request, $year) {
@@ -271,20 +269,22 @@ class CalendarController extends Controller
 
             if ($request->type === 'exam') {
 
+                $examName = trim($request->exam_name);
+
                 $ttr = TimeTableRecord::where('my_class_id', $request->class_id)
-                    ->where('exam_id', $request->exam_id)
+                    ->where('exam_name', $examName)
                     ->where('year', $year)
                     ->first();
 
                 if (!$ttr) {
 
                     $class = MyClass::findOrFail($request->class_id);
-                    $exam  = Exam::findOrFail($request->exam_id);
 
                     $ttr = TimeTableRecord::create([
-                        'name' => $class->name . ' - ' . $exam->name,
+                        'name' => $class->name . ' - ' . $examName,
                         'my_class_id' => $request->class_id,
-                        'exam_id' => $request->exam_id,
+                        'exam_id' => null,
+                        'exam_name' => $examName,
                         'year' => $year,
                     ]);
                 }
