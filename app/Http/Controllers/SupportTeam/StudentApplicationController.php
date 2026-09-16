@@ -11,6 +11,113 @@ use Illuminate\Support\Facades\Storage;
 class StudentApplicationController extends Controller
 {
     /**
+     * Show the public student registration form.
+     */
+    public function create()
+    {
+        return view('auth.studentregistration');
+    }
+
+    /**
+     * Handle the public student registration submission.
+     * Creates a pending StudentApplication for the admin to review/approve.
+     */
+    public function storePublic(Request $request)
+    {
+        $validated = $request->validate([
+
+            // Student
+            'full_name' => 'required|string|max:255',
+            'first_name' => 'nullable|string|max:100',
+            'last_name' => 'nullable|string|max:100',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|string|max:50',
+            'nationality' => 'nullable|string|max:100',
+            'place_of_birth' => 'nullable|string|max:255',
+
+            // Optional photo
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+
+            // Education
+            'current_school' => 'nullable|string|max:255',
+            'current_level' => 'nullable|string|max:100',
+            'previous_school' => 'nullable|string|max:255',
+
+            // Address
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+
+            // Application
+            'program' => 'required|string|max:100',
+            'requested_level' => 'required|string|max:100',
+            'academic_year' => 'nullable|string|max:50',
+            'desired_start_date' => 'nullable|date',
+            'academic_notes' => 'nullable|string',
+
+            // Parent / guardian
+            'parent_name' => 'required|string|max:255',
+            'parent_relationship' => 'nullable|string|max:100',
+            'parent_phone' => 'required|string|max:50',
+            'parent_whatsapp' => 'nullable|string|max:50',
+            'parent_email' => 'required|email|max:255',
+            'parent_occupation' => 'nullable|string|max:255',
+            'parent_address' => 'nullable|string',
+
+            // Emergency
+            'emergency_name' => 'nullable|string|max:255',
+            'emergency_relationship' => 'nullable|string|max:100',
+            'emergency_phone' => 'nullable|string|max:50',
+
+            // Additional
+            'medical_notes' => 'nullable|string',
+            'additional_comments' => 'nullable|string',
+            'how_did_you_hear' => 'nullable|string|max:255',
+        ]);
+
+        // Upload photo if provided
+        if ($request->hasFile('photo')) {
+            $validated['photo'] = $request
+                ->file('photo')
+                ->store('student-applications', 'public');
+        }
+
+        $application = StudentApplication::create([
+            ...$validated,
+            'application_number' => $this->generateApplicationNumber(),
+            'status' => 'pending',
+        ]);
+
+        return redirect()
+            ->route('studentregistration')
+            ->with(
+                'success',
+                'Votre dossier d\'inscription a été envoyé avec succès (N° '
+                    . $application->application_number
+                    . '). Il sera examiné par l\'administration.'
+            );
+    }
+
+    /**
+     * Generate a unique, sequential application number (APP-YYYY-0001).
+     */
+    protected function generateApplicationNumber()
+    {
+        $lastApplication = StudentApplication::latest('id')->first();
+
+        $nextNumber = $lastApplication
+            ? $lastApplication->id + 1
+            : 1;
+
+        return 'APP-' . date('Y') . '-' . str_pad(
+            $nextNumber,
+            4,
+            '0',
+            STR_PAD_LEFT
+        );
+    }
+
+    /**
      * Display all student applications.
      */
     public function index(Request $request)
@@ -176,6 +283,7 @@ class StudentApplicationController extends Controller
             'application' => $application
         ]);
     }
+
     /**
      * Change application status.
      */

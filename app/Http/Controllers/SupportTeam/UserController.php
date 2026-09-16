@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
+use App\Models\StudentApplication;
 
 class UserController extends Controller
 {
@@ -36,11 +36,49 @@ class UserController extends Controller
         $ut2 = $ut->where('level', '>', 2);
 
         $d['user_types'] = Qs::userIsAdmin() ? $ut2 : $ut;
+
         $d['states'] = $this->loc->getStates();
+
         $d['users'] = $this->user->getPTAUsers();
+
         $d['nationals'] = $this->loc->getAllNationals();
+
         $d['blood_groups'] = $this->user->getBloodGroups();
-        return view('pages.support_team.users.index', $d);
+
+        /*
+        |--------------------------------------------------------------------------
+        | STUDENT APPLICATIONS
+        |--------------------------------------------------------------------------
+        |
+        | This was missing before.
+        | The Blade file uses:
+        |
+        | @foreach($student_applications as $app)
+        |
+        | so we must pass this variable to the view.
+        |
+        */
+
+        $d['student_applications'] = StudentApplication::orderBy(
+            'created_at',
+            'desc'
+        )->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | PENDING APPLICATION COUNT
+        |--------------------------------------------------------------------------
+        */
+
+        $d['pending_applications'] = StudentApplication::where(
+            'status',
+            'pending'
+        )->count();
+
+        return view(
+            'pages.support_team.users.index',
+            $d
+        );
     }
 
     public function edit($id)

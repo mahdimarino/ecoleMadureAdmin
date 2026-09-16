@@ -71,6 +71,12 @@ Route::get('/test-email', function () {
 
 Auth::routes();
 
+Route::get('/studentregistration', 'SupportTeam\StudentApplicationController@create')
+    ->name('studentregistration');
+
+Route::post('/studentregistration', 'SupportTeam\StudentApplicationController@storePublic')
+    ->name('student.registration.store');
+
 Route::get('/teacherregrstarsion', 'SupportTeam\UserController@teacherRegistration')
     ->name('teacherregrstarsion');
 

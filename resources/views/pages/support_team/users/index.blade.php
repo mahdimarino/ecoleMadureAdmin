@@ -1,42 +1,90 @@
 @extends('layouts.master')
+
 @section('page_title', 'Manage Users')
+
 @section('content')
 
-
 <div class="card">
+
     <div class="card-header header-elements-inline">
-        <h6 class="card-title">Manage Users</h6>
+
+        <h6 class="card-title">
+            Manage Users
+        </h6>
+
         {!! Qs::getPanelOptions() !!}
+
     </div>
+
 
     <div class="card-body">
 
+        {{-- ========================================================= --}}
+        {{-- TABS --}}
+        {{-- ========================================================= --}}
+
         <ul class="nav nav-tabs nav-tabs-highlight">
 
+            {{-- CREATE USER --}}
             <li class="nav-item">
+
                 <a href="#new-user"
                    class="nav-link active"
                    data-toggle="tab">
+
                     Create New User
+
                 </a>
+
             </li>
 
+
+            {{-- MANAGE USERS --}}
             <li class="nav-item dropdown">
+
                 <a href="#"
                    class="nav-link dropdown-toggle"
                    data-toggle="dropdown">
+
                     Manage Users
+
                 </a>
 
+
                 <div class="dropdown-menu dropdown-menu-right">
+
                     @foreach($user_types as $ut)
+
                         <a href="#ut-{{ Qs::hash($ut->id) }}"
                            class="dropdown-item"
                            data-toggle="tab">
+
                             {{ $ut->name }}s
+
                         </a>
+
                     @endforeach
+
+
+                    {{-- STUDENT APPLICATIONS --}}
+                    <a href="#ut-student-applications"
+                       class="dropdown-item"
+                       data-toggle="tab">
+
+                        Students
+
+                        @if(isset($pending_applications) && $pending_applications > 0)
+
+                            <span class="badge badge-warning ml-1">
+                                {{ $pending_applications }}
+                            </span>
+
+                        @endif
+
+                    </a>
+
                 </div>
+
             </li>
 
         </ul>
@@ -44,11 +92,13 @@
 
         <div class="tab-content">
 
+
             {{-- ========================================================= --}}
             {{-- CREATE NEW USER --}}
             {{-- ========================================================= --}}
 
-            <div class="tab-pane fade show active" id="new-user">
+            <div class="tab-pane fade show active"
+                 id="new-user">
 
                 <form method="post"
                       enctype="multipart/form-data"
@@ -58,20 +108,36 @@
 
                     @csrf
 
-                    <h6>Personal Data</h6>
+
+                    <h6>
+                        Personal Data
+                    </h6>
+
 
                     <fieldset>
 
+                        {{-- ================================================= --}}
+                        {{-- ROW 1 --}}
+                        {{-- ================================================= --}}
+
                         <div class="row">
+
 
                             {{-- USER TYPE --}}
                             <div class="col-md-2">
+
                                 <div class="form-group">
 
                                     <label for="user_type">
+
                                         Select User:
-                                        <span class="text-danger">*</span>
+
+                                        <span class="text-danger">
+                                            *
+                                        </span>
+
                                     </label>
+
 
                                     <select required
                                             data-placeholder="Select User"
@@ -82,7 +148,9 @@
                                         @foreach($user_types as $ut)
 
                                             <option value="{{ Qs::hash($ut->id) }}">
+
                                                 {{ $ut->name }}
+
                                             </option>
 
                                         @endforeach
@@ -90,6 +158,7 @@
                                     </select>
 
                                 </div>
+
                             </div>
 
 
@@ -99,9 +168,15 @@
                                 <div class="form-group">
 
                                     <label>
+
                                         Full Name:
-                                        <span class="text-danger">*</span>
+
+                                        <span class="text-danger">
+                                            *
+                                        </span>
+
                                     </label>
+
 
                                     <input value="{{ old('name') }}"
                                            required
@@ -121,9 +196,15 @@
                                 <div class="form-group">
 
                                     <label>
+
                                         Address:
-                                        <span class="text-danger">*</span>
+
+                                        <span class="text-danger">
+                                            *
+                                        </span>
+
                                     </label>
+
 
                                     <input value="{{ old('address') }}"
                                            class="form-control"
@@ -139,14 +220,22 @@
                         </div>
 
 
+                        {{-- ================================================= --}}
+                        {{-- ROW 2 --}}
+                        {{-- ================================================= --}}
+
                         <div class="row">
+
 
                             {{-- EMAIL --}}
                             <div class="col-md-3">
 
                                 <div class="form-group">
 
-                                    <label>Email address:</label>
+                                    <label>
+                                        Email address:
+                                    </label>
+
 
                                     <input value="{{ old('email') }}"
                                            type="email"
@@ -164,7 +253,10 @@
 
                                 <div class="form-group">
 
-                                    <label>Username:</label>
+                                    <label>
+                                        Username:
+                                    </label>
+
 
                                     <input value="{{ old('username') }}"
                                            type="text"
@@ -182,7 +274,10 @@
 
                                 <div class="form-group">
 
-                                    <label>Phone:</label>
+                                    <label>
+                                        Phone:
+                                    </label>
+
 
                                     <input value="{{ old('phone') }}"
                                            type="text"
@@ -200,7 +295,10 @@
 
                                 <div class="form-group">
 
-                                    <label>Telephone:</label>
+                                    <label>
+                                        Telephone:
+                                    </label>
+
 
                                     <input value="{{ old('phone2') }}"
                                            type="text"
@@ -215,14 +313,22 @@
                         </div>
 
 
+                        {{-- ================================================= --}}
+                        {{-- ROW 3 --}}
+                        {{-- ================================================= --}}
+
                         <div class="row">
+
 
                             {{-- EMPLOYMENT DATE --}}
                             <div class="col-md-3">
 
                                 <div class="form-group">
 
-                                    <label>Date of Employment:</label>
+                                    <label>
+                                        Date of Employment:
+                                    </label>
+
 
                                     <input autocomplete="off"
                                            name="emp_date"
@@ -245,6 +351,7 @@
                                         Password:
                                     </label>
 
+
                                     <input id="password"
                                            type="password"
                                            name="password"
@@ -261,9 +368,15 @@
                                 <div class="form-group">
 
                                     <label for="gender">
+
                                         Gender:
-                                        <span class="text-danger">*</span>
+
+                                        <span class="text-danger">
+                                            *
+                                        </span>
+
                                     </label>
+
 
                                     <select class="select form-control"
                                             id="gender"
@@ -274,14 +387,22 @@
 
                                         <option value=""></option>
 
-                                        <option {{ (old('gender') == 'Male') ? 'selected' : '' }}
-                                                value="Male">
+
+                                        <option
+                                            {{ old('gender') == 'Male' ? 'selected' : '' }}
+                                            value="Male">
+
                                             Male
+
                                         </option>
 
-                                        <option {{ (old('gender') == 'Female') ? 'selected' : '' }}
-                                                value="Female">
+
+                                        <option
+                                            {{ old('gender') == 'Female' ? 'selected' : '' }}
+                                            value="Female">
+
                                             Female
+
                                         </option>
 
                                     </select>
@@ -297,9 +418,15 @@
                                 <div class="form-group">
 
                                     <label for="nal_id">
+
                                         Nationality:
-                                        <span class="text-danger">*</span>
+
+                                        <span class="text-danger">
+                                            *
+                                        </span>
+
                                     </label>
+
 
                                     <select data-placeholder="Choose..."
                                             required
@@ -309,12 +436,15 @@
 
                                         <option value=""></option>
 
+
                                         @foreach($nationals as $nal)
 
                                             <option
-                                                {{ (old('nal_id') == $nal->id ? 'selected' : '') }}
+                                                {{ old('nal_id') == $nal->id ? 'selected' : '' }}
                                                 value="{{ $nal->id }}">
+
                                                 {{ $nal->name }}
+
                                             </option>
 
                                         @endforeach
@@ -328,15 +458,26 @@
                         </div>
 
 
+                        {{-- ================================================= --}}
+                        {{-- ROW 4 --}}
+                        {{-- ================================================= --}}
+
                         <div class="row">
+
 
                             {{-- STATE --}}
                             <div class="col-md-4">
 
                                 <label for="state_id">
+
                                     State:
-                                    <span class="text-danger">*</span>
+
+                                    <span class="text-danger">
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <select onchange="getLGA(this.value)"
                                         required
@@ -347,12 +488,15 @@
 
                                     <option value=""></option>
 
+
                                     @foreach($states as $st)
 
                                         <option
-                                            {{ (old('state_id') == $st->id ? 'selected' : '') }}
+                                            {{ old('state_id') == $st->id ? 'selected' : '' }}
                                             value="{{ $st->id }}">
+
                                             {{ $st->name }}
+
                                         </option>
 
                                     @endforeach
@@ -366,9 +510,15 @@
                             <div class="col-md-4">
 
                                 <label for="lga_id">
+
                                     LGA:
-                                    <span class="text-danger">*</span>
+
+                                    <span class="text-danger">
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <select required
                                         data-placeholder="Select State First"
@@ -392,6 +542,7 @@
                                         Blood Group:
                                     </label>
 
+
                                     <select class="select form-control"
                                             id="bg_id"
                                             name="bg_id"
@@ -400,12 +551,15 @@
 
                                         <option value=""></option>
 
+
                                         @foreach($blood_groups as $bg)
 
                                             <option
-                                                {{ (old('bg_id') == $bg->id ? 'selected' : '') }}
+                                                {{ old('bg_id') == $bg->id ? 'selected' : '' }}
                                                 value="{{ $bg->id }}">
+
                                                 {{ $bg->name }}
+
                                             </option>
 
                                         @endforeach
@@ -419,9 +573,12 @@
                         </div>
 
 
+                        {{-- ================================================= --}}
+                        {{-- PHOTO --}}
+                        {{-- ================================================= --}}
+
                         <div class="row">
 
-                            {{-- PASSPORT --}}
                             <div class="col-md-6">
 
                                 <div class="form-group">
@@ -430,16 +587,20 @@
                                         Upload Passport Photo:
                                     </label>
 
-                                    <input value="{{ old('photo') }}"
-                                           accept="image/*"
-                                           type="file"
-                                           name="photo"
-                                           class="form-input-styled"
-                                           data-fouc>
+
+                                    <input
+                                        accept="image/*"
+                                        type="file"
+                                        name="photo"
+                                        class="form-input-styled"
+                                        data-fouc>
+
 
                                     <span class="form-text text-muted">
+
                                         Accepted Images: jpeg, png.
                                         Max file size 2Mb
+
                                     </span>
 
                                 </div>
@@ -456,13 +617,14 @@
 
 
             {{-- ========================================================= --}}
-            {{-- USER LISTS --}}
+            {{-- NORMAL USER LISTS --}}
             {{-- ========================================================= --}}
 
             @foreach($user_types as $ut)
 
                 <div class="tab-pane fade"
                      id="ut-{{ Qs::hash($ut->id) }}">
+
 
                     <table class="table datatable-button-html5-columns">
 
@@ -471,18 +633,41 @@
                             <tr>
 
                                 <th>S/N</th>
-                                <th>Photo</th>
-                                <th>Name</th>
-                                <th>Username</th>
-                                <th>Phone</th>
-                                <th>Email</th>
 
-                                {{-- Approval status --}}
+                                <th>
+                                    Photo
+                                </th>
+
+                                <th>
+                                    Name
+                                </th>
+
+                                <th>
+                                    Username
+                                </th>
+
+                                <th>
+                                    Phone
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+
+                                {{-- Teacher status --}}
                                 @if($ut->title === 'teacher')
-                                    <th>Status</th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
                                 @endif
 
-                                <th>Action</th>
+
+                                <th>
+                                    Action
+                                </th>
 
                             </tr>
 
@@ -491,9 +676,13 @@
 
                         <tbody>
 
-                            @foreach($users->where('user_type', $ut->title) as $u)
+                            @foreach(
+                                $users->where('user_type', $ut->title)
+                                as $u
+                            )
 
                                 <tr>
+
 
                                     <td>
                                         {{ $loop->iteration }}
@@ -502,10 +691,11 @@
 
                                     <td>
 
-                                        <img class="rounded-circle"
-                                             style="height: 40px; width: 40px;"
-                                             src="{{ $u->photo }}"
-                                             alt="photo">
+                                        <img
+                                            class="rounded-circle"
+                                            style="height:40px;width:40px;"
+                                            src="{{ $u->photo }}"
+                                            alt="photo">
 
                                     </td>
 
@@ -531,7 +721,7 @@
 
 
                                     {{-- ================================================= --}}
-                                    {{-- TEACHER APPROVAL STATUS --}}
+                                    {{-- TEACHER STATUS --}}
                                     {{-- ================================================= --}}
 
                                     @if($ut->title === 'teacher')
@@ -578,21 +768,26 @@
 
                                                 <div class="dropdown-menu dropdown-menu-left">
 
-                                                    {{-- View Profile --}}
-                                                    <a href="{{ route('users.show', Qs::hash($u->id)) }}"
-                                                       class="dropdown-item">
+
+                                                    {{-- VIEW PROFILE --}}
+                                                    <a
+                                                        href="{{ route('users.show', Qs::hash($u->id)) }}"
+                                                        class="dropdown-item">
 
                                                         <i class="icon-eye"></i>
+
                                                         View Profile
 
                                                     </a>
 
 
-                                                    {{-- Edit --}}
-                                                    <a href="{{ route('users.edit', Qs::hash($u->id)) }}"
-                                                       class="dropdown-item">
+                                                    {{-- EDIT --}}
+                                                    <a
+                                                        href="{{ route('users.edit', Qs::hash($u->id)) }}"
+                                                        class="dropdown-item">
 
                                                         <i class="icon-pencil"></i>
+
                                                         Edit
 
                                                     </a>
@@ -609,23 +804,28 @@
                                                             <span class="dropdown-item text-success">
 
                                                                 <i class="icon-check"></i>
+
                                                                 Approved
 
                                                             </span>
 
                                                         @else
 
-                                                            <form method="POST"
-                                                                  action="{{ route('users.approveTeacher', $u->id) }}">
+                                                            <form
+                                                                method="POST"
+                                                                action="{{ route('users.approveTeacher', $u->id) }}">
 
                                                                 @csrf
 
                                                                 @method('PATCH')
 
-                                                                <button type="submit"
-                                                                        class="dropdown-item text-success">
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="dropdown-item text-success">
 
                                                                     <i class="icon-check"></i>
+
                                                                     Approve Teacher
 
                                                                 </button>
@@ -643,35 +843,45 @@
 
                                                     @if(Qs::userIsSuperAdmin())
 
-                                                        {{-- Reset Password --}}
-                                                    <a href="#"
-   class="dropdown-item"
-   data-toggle="modal"
-   data-target="#resetUserPasswordModal"
-   data-user-id="{{ Qs::hash($u->id) }}"
-   data-user-name="{{ $u->name }}">
-    <i class="icon-lock"></i> Reset password
-</a>
+
+                                                        {{-- RESET PASSWORD --}}
+                                                        <a
+                                                            href="#"
+                                                            class="dropdown-item"
+                                                            data-toggle="modal"
+                                                            data-target="#resetUserPasswordModal"
+                                                            data-user-id="{{ Qs::hash($u->id) }}"
+                                                            data-user-name="{{ $u->name }}">
+
+                                                            <i class="icon-lock"></i>
+
+                                                            Reset password
+
+                                                        </a>
 
 
-                                                        {{-- Delete --}}
-                                                        <a id="{{ Qs::hash($u->id) }}"
-                                                           onclick="confirmDelete(this.id)"
-                                                           href="#"
-                                                           class="dropdown-item">
+                                                        {{-- DELETE --}}
+                                                        <a
+                                                            id="{{ Qs::hash($u->id) }}"
+                                                            onclick="confirmDelete(this.id)"
+                                                            href="#"
+                                                            class="dropdown-item">
 
                                                             <i class="icon-trash"></i>
+
                                                             Delete
 
                                                         </a>
 
 
-                                                        <form method="post"
-                                                              id="item-delete-{{ Qs::hash($u->id) }}"
-                                                              action="{{ route('users.destroy', Qs::hash($u->id)) }}"
-                                                              class="hidden">
+                                                        <form
+                                                            method="post"
+                                                            id="item-delete-{{ Qs::hash($u->id) }}"
+                                                            action="{{ route('users.destroy', Qs::hash($u->id)) }}"
+                                                            class="hidden">
 
                                                             @csrf
+
                                                             @method('delete')
 
                                                         </form>
@@ -698,43 +908,371 @@
 
             @endforeach
 
+
+            {{-- ========================================================= --}}
+            {{-- STUDENT APPLICATIONS --}}
+            {{-- ========================================================= --}}
+
+            <div class="tab-pane fade"
+                 id="ut-student-applications">
+
+
+                <table class="table datatable-button-html5-columns">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                S/N
+                            </th>
+
+                            <th>
+                                Photo
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Application No.
+                            </th>
+
+                            <th>
+                                Phone
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @forelse($student_applications as $app)
+
+                            <tr>
+
+
+                                {{-- NUMBER --}}
+                                <td>
+                                    {{ $loop->iteration }}
+                                </td>
+
+
+                                {{-- PHOTO --}}
+                                <td>
+
+                                    <img
+                                        class="rounded-circle"
+                                        style="height:40px;width:40px;"
+                                        src="{{ $app->photo
+                                            ? asset('storage/' . $app->photo)
+                                            : Qs::getDefaultUserImage() }}"
+                                        alt="photo">
+
+                                </td>
+
+
+                                {{-- NAME --}}
+                                <td>
+                                    {{ $app->full_name }}
+                                </td>
+
+
+                                {{-- APPLICATION NUMBER --}}
+                                <td>
+                                    {{ $app->application_number }}
+                                </td>
+
+
+                                {{-- PHONE --}}
+                                <td>
+                                    {{ $app->parent_phone }}
+                                </td>
+
+
+                                {{-- EMAIL --}}
+                                <td>
+                                    {{ $app->parent_email }}
+                                </td>
+
+
+                                {{-- ================================================= --}}
+                                {{-- APPLICATION STATUS --}}
+                                {{-- ================================================= --}}
+
+                                <td>
+
+                                    @if($app->status === 'accepted')
+
+                                        <span class="badge badge-success">
+
+                                            Approved
+
+                                        </span>
+
+
+                                    @elseif($app->status === 'rejected')
+
+                                        <span class="badge badge-danger">
+
+                                            Rejected
+
+                                        </span>
+
+
+                                    @elseif($app->status === 'reviewing')
+
+                                        <span class="badge badge-info">
+
+                                            Reviewing
+
+                                        </span>
+
+
+                                    @else
+
+                                        <span class="badge badge-warning">
+
+                                            Pending Approval
+
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+
+                                {{-- ================================================= --}}
+                                {{-- ACTIONS --}}
+                                {{-- ================================================= --}}
+
+                                <td class="text-center">
+
+                                    <div class="list-icons">
+
+                                        <div class="dropdown">
+
+                                            <a
+                                                href="#"
+                                                class="list-icons-item"
+                                                data-toggle="dropdown">
+
+                                                <i class="icon-menu9"></i>
+
+                                            </a>
+
+
+                                            <div class="dropdown-menu dropdown-menu-left">
+
+
+                                                {{-- VIEW APPLICATION --}}
+                                                <a
+                                                    href="{{ route('student-applications.show', $app->id) }}"
+                                                    class="dropdown-item">
+
+                                                    <i class="icon-eye"></i>
+
+                                                    View Profile
+
+                                                </a>
+
+
+                                                {{-- EDIT APPLICATION --}}
+                                                <a
+                                                    href="{{ route('student-applications.edit', $app->id) }}"
+                                                    class="dropdown-item">
+
+                                                    <i class="icon-pencil"></i>
+
+                                                    Edit
+
+                                                </a>
+
+
+                                                {{-- ================================================= --}}
+                                                {{-- STUDENT APPROVAL --}}
+                                                {{-- ================================================= --}}
+
+                                                @if($app->status === 'accepted')
+
+                                                    <span class="dropdown-item text-success">
+
+                                                        <i class="icon-check"></i>
+
+                                                        Approved
+
+                                                    </span>
+
+                                                @else
+
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route('student-applications.status', $app->id) }}">
+
+                                                        @csrf
+
+                                                        @method('PUT')
+
+
+                                                        <input
+                                                            type="hidden"
+                                                            name="status"
+                                                            value="accepted">
+
+
+                                                        <button
+                                                            type="submit"
+                                                            class="dropdown-item text-success">
+
+                                                            <i class="icon-check"></i>
+
+                                                            Approve Student
+
+                                                        </button>
+
+                                                    </form>
+
+                                                @endif
+
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="8"
+                                    class="text-center text-muted">
+
+                                    No student applications found.
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
         </div>
 
     </div>
 
 </div>
 
-<div class="modal fade" id="resetUserPasswordModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+
+{{-- ========================================================= --}}
+{{-- RESET PASSWORD MODAL --}}
+{{-- ========================================================= --}}
+
+<div
+    class="modal fade"
+    id="resetUserPasswordModal"
+    tabindex="-1"
+    role="dialog">
+
+
+    <div
+        class="modal-dialog"
+        role="document">
+
+
         <div class="modal-content">
 
-            <form method="POST" action="{{ route('users.reset_pass') }}">
+
+            <form
+                method="POST"
+                action="{{ route('users.reset_pass') }}">
+
                 @csrf
 
+
                 <div class="modal-header">
+
                     <h5 class="modal-title">
+
                         Réinitialiser le mot de passe
+
                     </h5>
 
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
+
+                    <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                        <span>
+                            &times;
+                        </span>
+
                     </button>
+
                 </div>
+
 
                 <div class="modal-body">
 
-                    <input type="hidden" name="user_id" id="reset_user_id">
 
+                    {{-- USER ID --}}
+                    <input
+                        type="hidden"
+                        name="user_id"
+                        id="reset_user_id">
+
+
+                    {{-- USER NAME --}}
                     <div class="form-group">
-                        <label>Utilisateur :</label>
+
+                        <label>
+                            Utilisateur :
+                        </label>
+
+
                         <strong id="reset_user_name"></strong>
+
                     </div>
 
+
+                    {{-- NEW PASSWORD --}}
                     <div class="form-group">
+
                         <label>
+
                             Nouveau mot de passe :
-                            <span class="text-danger">*</span>
+
+                            <span class="text-danger">
+                                *
+                            </span>
+
                         </label>
+
 
                         <input
                             type="password"
@@ -743,13 +1281,23 @@
                             placeholder="Nouveau mot de passe"
                             required
                             minlength="6">
+
                     </div>
 
+
+                    {{-- CONFIRM PASSWORD --}}
                     <div class="form-group">
+
                         <label>
+
                             Confirmer le mot de passe :
-                            <span class="text-danger">*</span>
+
+                            <span class="text-danger">
+                                *
+                            </span>
+
                         </label>
+
 
                         <input
                             type="password"
@@ -758,19 +1306,33 @@
                             placeholder="Confirmer le mot de passe"
                             required
                             minlength="6">
+
                     </div>
 
                 </div>
 
+
                 <div class="modal-footer">
 
-                    <button type="button" class="btn btn-light" data-dismiss="modal">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-dismiss="modal">
+
                         Annuler
+
                     </button>
 
-                    <button type="submit" class="btn btn-primary">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+
                         <i class="icon-lock"></i>
+
                         Modifier le mot de passe
+
                     </button>
 
                 </div>
@@ -778,18 +1340,36 @@
             </form>
 
         </div>
+
     </div>
+
 </div>
 
+
+{{-- ========================================================= --}}
+{{-- RESET PASSWORD JS --}}
+{{-- ========================================================= --}}
+
 <script>
-    $('#resetUserPasswordModal').on('show.bs.modal', function (event) {
 
-        var button = $(event.relatedTarget);
+    $('#resetUserPasswordModal').on(
+        'show.bs.modal',
+        function (event) {
 
-        $('#reset_user_id').val(button.data('user-id'));
-        $('#reset_user_name').text(button.data('user-name'));
+            var button = $(event.relatedTarget);
 
-    });
+            $('#reset_user_id').val(
+                button.data('user-id')
+            );
+
+            $('#reset_user_name').text(
+                button.data('user-name')
+            );
+
+        }
+    );
+
 </script>
+
 
 @endsection
