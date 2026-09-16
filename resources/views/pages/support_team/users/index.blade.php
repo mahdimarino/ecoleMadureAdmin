@@ -1120,32 +1120,22 @@
 
                                                 @else
 
-                                                    <form
-                                                        method="POST"
-                                                        action="{{ route('student-applications.status', $app->id) }}">
+                                                    <form method="POST"
+      action="{{ route('student-applications.approve', $app->id) }}">
 
-                                                        @csrf
+    @csrf
 
-                                                        @method('PUT')
+    @method('PATCH')
 
+    <button type="submit"
+            class="dropdown-item text-success">
 
-                                                        <input
-                                                            type="hidden"
-                                                            name="status"
-                                                            value="accepted">
+        <i class="icon-check"></i>
+        Approve Student
 
+    </button>
 
-                                                        <button
-                                                            type="submit"
-                                                            class="dropdown-item text-success">
-
-                                                            <i class="icon-check"></i>
-
-                                                            Approve Student
-
-                                                        </button>
-
-                                                    </form>
+</form>
 
                                                 @endif
 

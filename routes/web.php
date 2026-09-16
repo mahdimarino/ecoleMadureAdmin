@@ -1,11 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route; // <- ADD THIS IMPORT AT THE TOP
 use App\Http\Controllers\Admin\NewsController; // <- Import NewsController
+use App\Http\Controllers\CourseMaterialController;
+use App\Http\Controllers\SupportTeam\StudentApplicationController;
 use App\Http\Controllers\SupportTeam\TimetableAdminController;
 use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Mail;
-use App\Http\Controllers\CourseMaterialController;
+use Illuminate\Support\Facades\Route; // <- ADD THIS IMPORT AT THE TOP
 
 Route::get(
     '/timetable-management',
@@ -76,6 +77,11 @@ Route::get('/studentregistration', 'SupportTeam\StudentApplicationController@cre
 
 Route::post('/studentregistration', 'SupportTeam\StudentApplicationController@storePublic')
     ->name('student.registration.store');
+
+Route::patch(
+    '/student-applications/{id}/approve',
+    [StudentApplicationController::class, 'approve']
+)->name('student-applications.approve');
 
 Route::get('/teacherregrstarsion', 'SupportTeam\UserController@teacherRegistration')
     ->name('teacherregrstarsion');

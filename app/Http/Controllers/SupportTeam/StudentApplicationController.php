@@ -329,4 +329,16 @@ class StudentApplicationController extends Controller
             ->route('student-applications.index')
             ->with('success', 'Application deleted successfully.');
     }
+    public function approve($id)
+    {
+        $application = StudentApplication::findOrFail($id);
+
+        $application->status = 'accepted';
+        $application->save();
+
+        return back()->with(
+            'success',
+            'Student approved successfully.'
+        );
+    }
 }
