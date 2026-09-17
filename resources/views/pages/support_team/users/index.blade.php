@@ -116,12 +116,8 @@
 
                     <fieldset>
 
-                        {{-- ================================================= --}}
                         {{-- ROW 1 --}}
-                        {{-- ================================================= --}}
-
                         <div class="row">
-
 
                             {{-- USER TYPE --}}
                             <div class="col-md-2">
@@ -132,9 +128,7 @@
 
                                         Select User:
 
-                                        <span class="text-danger">
-                                            *
-                                        </span>
+                                        <span class="text-danger">*</span>
 
                                     </label>
 
@@ -171,9 +165,7 @@
 
                                         Full Name:
 
-                                        <span class="text-danger">
-                                            *
-                                        </span>
+                                        <span class="text-danger">*</span>
 
                                     </label>
 
@@ -199,9 +191,7 @@
 
                                         Address:
 
-                                        <span class="text-danger">
-                                            *
-                                        </span>
+                                        <span class="text-danger">*</span>
 
                                     </label>
 
@@ -220,12 +210,8 @@
                         </div>
 
 
-                        {{-- ================================================= --}}
                         {{-- ROW 2 --}}
-                        {{-- ================================================= --}}
-
                         <div class="row">
-
 
                             {{-- EMAIL --}}
                             <div class="col-md-3">
@@ -313,12 +299,8 @@
                         </div>
 
 
-                        {{-- ================================================= --}}
                         {{-- ROW 3 --}}
-                        {{-- ================================================= --}}
-
                         <div class="row">
-
 
                             {{-- EMPLOYMENT DATE --}}
                             <div class="col-md-3">
@@ -371,9 +353,7 @@
 
                                         Gender:
 
-                                        <span class="text-danger">
-                                            *
-                                        </span>
+                                        <span class="text-danger">*</span>
 
                                     </label>
 
@@ -386,7 +366,6 @@
                                             data-placeholder="Choose..">
 
                                         <option value=""></option>
-
 
                                         <option
                                             {{ old('gender') == 'Male' ? 'selected' : '' }}
@@ -421,9 +400,7 @@
 
                                         Nationality:
 
-                                        <span class="text-danger">
-                                            *
-                                        </span>
+                                        <span class="text-danger">*</span>
 
                                     </label>
 
@@ -435,7 +412,6 @@
                                             class="select-search form-control">
 
                                         <option value=""></option>
-
 
                                         @foreach($nationals as $nal)
 
@@ -458,12 +434,8 @@
                         </div>
 
 
-                        {{-- ================================================= --}}
                         {{-- ROW 4 --}}
-                        {{-- ================================================= --}}
-
                         <div class="row">
-
 
                             {{-- STATE --}}
                             <div class="col-md-4">
@@ -472,9 +444,7 @@
 
                                     State:
 
-                                    <span class="text-danger">
-                                        *
-                                    </span>
+                                    <span class="text-danger">*</span>
 
                                 </label>
 
@@ -487,7 +457,6 @@
                                         id="state_id">
 
                                     <option value=""></option>
-
 
                                     @foreach($states as $st)
 
@@ -513,9 +482,7 @@
 
                                     LGA:
 
-                                    <span class="text-danger">
-                                        *
-                                    </span>
+                                    <span class="text-danger">*</span>
 
                                 </label>
 
@@ -551,7 +518,6 @@
 
                                         <option value=""></option>
 
-
                                         @foreach($blood_groups as $bg)
 
                                             <option
@@ -573,10 +539,7 @@
                         </div>
 
 
-                        {{-- ================================================= --}}
                         {{-- PHOTO --}}
-                        {{-- ================================================= --}}
-
                         <div class="row">
 
                             <div class="col-md-6">
@@ -625,7 +588,6 @@
                 <div class="tab-pane fade"
                      id="ut-{{ Qs::hash($ut->id) }}">
 
-
                     <table class="table datatable-button-html5-columns">
 
                         <thead>
@@ -633,37 +595,19 @@
                             <tr>
 
                                 <th>S/N</th>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Phone</th>
+                                <th>Email</th>
 
-                                <th>
-                                    Photo
-                                </th>
-
-                                <th>
-                                    Name
-                                </th>
-
-                                <th>
-                                    Username
-                                </th>
-
-                                <th>
-                                    Phone
-                                </th>
-
-                                <th>
-                                    Email
-                                </th>
-
-
-                                {{-- Teacher status --}}
-                                @if($ut->title === 'teacher')
+                                @if(in_array($ut->title, ['teacher', 'student']))
 
                                     <th>
                                         Status
                                     </th>
 
                                 @endif
-
 
                                 <th>
                                     Action
@@ -676,13 +620,9 @@
 
                         <tbody>
 
-                            @foreach(
-                                $users->where('user_type', $ut->title)
-                                as $u
-                            )
+                            @foreach($users->where('user_type', $ut->title) as $u)
 
                                 <tr>
-
 
                                     <td>
                                         {{ $loop->iteration }}
@@ -720,11 +660,8 @@
                                     </td>
 
 
-                                    {{-- ================================================= --}}
-                                    {{-- TEACHER STATUS --}}
-                                    {{-- ================================================= --}}
-
-                                    @if($ut->title === 'teacher')
+                                    {{-- STATUS --}}
+                                    @if(in_array($ut->title, ['teacher', 'student']))
 
                                         <td>
 
@@ -747,10 +684,7 @@
                                     @endif
 
 
-                                    {{-- ================================================= --}}
-                                    {{-- ACTIONS --}}
-                                    {{-- ================================================= --}}
-
+                                    {{-- ACTION --}}
                                     <td class="text-center">
 
                                         <div class="list-icons">
@@ -819,7 +753,6 @@
 
                                                                 @method('PATCH')
 
-
                                                                 <button
                                                                     type="submit"
                                                                     class="dropdown-item text-success">
@@ -827,6 +760,46 @@
                                                                     <i class="icon-check"></i>
 
                                                                     Approve Teacher
+
+                                                                </button>
+
+                                                            </form>
+
+                                                        @endif
+
+                                                    {{-- ================================================= --}}
+                                                    {{-- STUDENT APPROVAL --}}
+                                                    {{-- ================================================= --}}
+
+                                                    @elseif($ut->title === 'student')
+
+                                                        @if($u->is_approved)
+
+                                                            <span class="dropdown-item text-success">
+
+                                                                <i class="icon-check"></i>
+
+                                                                Approved
+
+                                                            </span>
+
+                                                        @else
+
+                                                            <form
+                                                                method="POST"
+                                                                action="{{ route('users.approveStudent', $u->id) }}">
+
+                                                                @csrf
+
+                                                                @method('PATCH')
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="dropdown-item text-success">
+
+                                                                    <i class="icon-check"></i>
+
+                                                                    Approve Student
 
                                                                 </button>
 
@@ -842,7 +815,6 @@
                                                     {{-- ================================================= --}}
 
                                                     @if(Qs::userIsSuperAdmin())
-
 
                                                         {{-- RESET PASSWORD --}}
                                                         <a
@@ -923,37 +895,14 @@
 
                         <tr>
 
-                            <th>
-                                S/N
-                            </th>
-
-                            <th>
-                                Photo
-                            </th>
-
-                            <th>
-                                Name
-                            </th>
-
-                            <th>
-                                Application No.
-                            </th>
-
-                            <th>
-                                Phone
-                            </th>
-
-                            <th>
-                                Email
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Action
-                            </th>
+                            <th>S/N</th>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Application No.</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Action</th>
 
                         </tr>
 
@@ -964,16 +913,13 @@
 
                         @forelse($student_applications as $app)
 
-                            <tr>
+                            <tr data-application-id="{{ $app->id }}">
 
-
-                                {{-- NUMBER --}}
                                 <td>
                                     {{ $loop->iteration }}
                                 </td>
 
 
-                                {{-- PHOTO --}}
                                 <td>
 
                                     <img
@@ -987,69 +933,51 @@
                                 </td>
 
 
-                                {{-- NAME --}}
                                 <td>
                                     {{ $app->full_name }}
                                 </td>
 
 
-                                {{-- APPLICATION NUMBER --}}
                                 <td>
                                     {{ $app->application_number }}
                                 </td>
 
 
-                                {{-- PHONE --}}
                                 <td>
                                     {{ $app->parent_phone }}
                                 </td>
 
 
-                                {{-- EMAIL --}}
                                 <td>
                                     {{ $app->parent_email }}
                                 </td>
 
 
-                                {{-- ================================================= --}}
-                                {{-- APPLICATION STATUS --}}
-                                {{-- ================================================= --}}
-
-                                <td>
+                                {{-- STATUS --}}
+                                <td class="application-status">
 
                                     @if($app->status === 'accepted')
 
                                         <span class="badge badge-success">
-
                                             Approved
-
                                         </span>
-
 
                                     @elseif($app->status === 'rejected')
 
                                         <span class="badge badge-danger">
-
                                             Rejected
-
                                         </span>
-
 
                                     @elseif($app->status === 'reviewing')
 
                                         <span class="badge badge-info">
-
                                             Reviewing
-
                                         </span>
-
 
                                     @else
 
                                         <span class="badge badge-warning">
-
                                             Pending Approval
-
                                         </span>
 
                                     @endif
@@ -1057,10 +985,7 @@
                                 </td>
 
 
-                                {{-- ================================================= --}}
-                                {{-- ACTIONS --}}
-                                {{-- ================================================= --}}
-
+                                {{-- ACTION --}}
                                 <td class="text-center">
 
                                     <div class="list-icons">
@@ -1080,7 +1005,7 @@
                                             <div class="dropdown-menu dropdown-menu-left">
 
 
-                                                {{-- VIEW APPLICATION --}}
+                                                {{-- VIEW --}}
                                                 <a
                                                     href="{{ route('student-applications.show', $app->id) }}"
                                                     class="dropdown-item">
@@ -1092,7 +1017,7 @@
                                                 </a>
 
 
-                                                {{-- EDIT APPLICATION --}}
+                                                {{-- EDIT --}}
                                                 <a
                                                     href="{{ route('student-applications.edit', $app->id) }}"
                                                     class="dropdown-item">
@@ -1105,37 +1030,46 @@
 
 
                                                 {{-- ================================================= --}}
-                                                {{-- STUDENT APPROVAL --}}
+                                                {{-- AJAX APPROVE STUDENT --}}
                                                 {{-- ================================================= --}}
 
-                                                @if($app->status === 'accepted')
+                                                @if($app->user_id)
 
-                                                    <span class="dropdown-item text-success">
+                                                    @if($app->user && $app->user->is_approved)
 
-                                                        <i class="icon-check"></i>
+                                                        <span class="dropdown-item text-success">
 
-                                                        Approved
+                                                            <i class="icon-check"></i>
 
-                                                    </span>
+                                                            Approved
+
+                                                        </span>
+
+                                                    @else
+
+                                                        <button
+                                                            type="button"
+                                                            class="dropdown-item text-success approve-student-btn"
+                                                            data-id="{{ $app->id }}"
+                                                            data-url="{{ route('student-applications.ajaxApprove', $app->id) }}">
+
+                                                            <i class="icon-check"></i>
+
+                                                            Approve Student
+
+                                                        </button>
+
+                                                    @endif
 
                                                 @else
 
-                                                    <form method="POST"
-      action="{{ route('student-applications.approve', $app->id) }}">
+                                                    <span class="dropdown-item text-warning">
 
-    @csrf
+                                                        <i class="icon-warning"></i>
 
-    @method('PATCH')
+                                                        No student user linked
 
-    <button type="submit"
-            class="dropdown-item text-success">
-
-        <i class="icon-check"></i>
-        Approve Student
-
-    </button>
-
-</form>
+                                                    </span>
 
                                                 @endif
 
@@ -1188,14 +1122,11 @@
     tabindex="-1"
     role="dialog">
 
-
     <div
         class="modal-dialog"
         role="document">
 
-
         <div class="modal-content">
-
 
             <form
                 method="POST"
@@ -1229,37 +1160,30 @@
 
                 <div class="modal-body">
 
-
-                    {{-- USER ID --}}
                     <input
                         type="hidden"
                         name="user_id"
                         id="reset_user_id">
 
 
-                    {{-- USER NAME --}}
                     <div class="form-group">
 
                         <label>
                             Utilisateur :
                         </label>
 
-
                         <strong id="reset_user_name"></strong>
 
                     </div>
 
 
-                    {{-- NEW PASSWORD --}}
                     <div class="form-group">
 
                         <label>
 
                             Nouveau mot de passe :
 
-                            <span class="text-danger">
-                                *
-                            </span>
+                            <span class="text-danger">*</span>
 
                         </label>
 
@@ -1275,16 +1199,13 @@
                     </div>
 
 
-                    {{-- CONFIRM PASSWORD --}}
                     <div class="form-group">
 
                         <label>
 
                             Confirmer le mot de passe :
 
-                            <span class="text-danger">
-                                *
-                            </span>
+                            <span class="text-danger">*</span>
 
                         </label>
 
@@ -1303,7 +1224,6 @@
 
 
                 <div class="modal-footer">
-
 
                     <button
                         type="button"
@@ -1337,14 +1257,20 @@
 
 
 {{-- ========================================================= --}}
-{{-- RESET PASSWORD JS --}}
+{{-- JAVASCRIPT --}}
 {{-- ========================================================= --}}
 
 <script>
 
+    /*
+    |--------------------------------------------------------------------------
+    | Reset Password Modal
+    |--------------------------------------------------------------------------
+    */
+
     $('#resetUserPasswordModal').on(
         'show.bs.modal',
-        function (event) {
+        function(event) {
 
             var button = $(event.relatedTarget);
 
@@ -1355,6 +1281,165 @@
             $('#reset_user_name').text(
                 button.data('user-name')
             );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AJAX STUDENT APPROVAL
+    |--------------------------------------------------------------------------
+    */
+
+    $(document).on(
+        'click',
+        '.approve-student-btn',
+        function(e) {
+
+            e.preventDefault();
+
+            var button = $(this);
+
+            var url = button.data('url');
+
+            var row = button.closest('tr');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Prevent double click
+            |--------------------------------------------------------------------------
+            */
+
+            button.prop('disabled', true);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Loading state
+            |--------------------------------------------------------------------------
+            */
+
+            button.html(
+                '<i class="icon-spinner2 spinner"></i> Approving...'
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | AJAX REQUEST
+            |--------------------------------------------------------------------------
+            */
+
+            $.ajax({
+
+                url: url,
+
+                type: 'PATCH',
+
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | SUCCESS
+                |--------------------------------------------------------------------------
+                */
+
+                success: function(response) {
+
+                    if (response.success) {
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Update Status Badge
+                        |--------------------------------------------------------------------------
+                        */
+
+                        row.find('.application-status').html(
+                            '<span class="badge badge-success">' +
+                                'Approved' +
+                            '</span>'
+                        );
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Replace Approve Button
+                        |--------------------------------------------------------------------------
+                        */
+
+                        button.replaceWith(
+                            '<span class="dropdown-item text-success">' +
+                                '<i class="icon-check"></i> ' +
+                                'Approved' +
+                            '</span>'
+                        );
+
+                    } else {
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Failed response
+                        |--------------------------------------------------------------------------
+                        */
+
+                        button.prop('disabled', false);
+
+                        button.html(
+                            '<i class="icon-check"></i> ' +
+                            'Approve Student'
+                        );
+
+                        alert(
+                            response.message ||
+                            'Unable to approve student.'
+                        );
+
+                    }
+
+                },
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | ERROR
+                |--------------------------------------------------------------------------
+                */
+
+                error: function(xhr) {
+
+                    button.prop('disabled', false);
+
+                    button.html(
+                        '<i class="icon-check"></i> ' +
+                        'Approve Student'
+                    );
+
+
+                    var message =
+                        'Unable to approve student.';
+
+
+                    if (
+                        xhr.responseJSON &&
+                        xhr.responseJSON.message
+                    ) {
+
+                        message =
+                            xhr.responseJSON.message;
+
+                    }
+
+
+                    alert(message);
+
+                }
+
+            });
 
         }
     );

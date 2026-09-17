@@ -11,7 +11,7 @@ class StudentApplication extends Model
 
     protected $fillable = [
         'application_number',
-
+        'user_id',
         'full_name',
         'first_name',
         'last_name',

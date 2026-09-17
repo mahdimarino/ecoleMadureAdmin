@@ -7,6 +7,10 @@ use App\Models\StudentApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class StudentApplicationController extends Controller
 {
@@ -75,18 +79,119 @@ class StudentApplicationController extends Controller
             'how_did_you_hear' => 'nullable|string|max:255',
         ]);
 
-        // Upload photo if provided
+        /*
+    |--------------------------------------------------------------------------
+    | Upload photo
+    |--------------------------------------------------------------------------
+    */
+
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request
                 ->file('photo')
                 ->store('student-applications', 'public');
         }
 
-        $application = StudentApplication::create([
-            ...$validated,
-            'application_number' => $this->generateApplicationNumber(),
-            'status' => 'pending',
-        ]);
+        /*
+    |--------------------------------------------------------------------------
+    | Create student + application
+    |--------------------------------------------------------------------------
+    */
+
+        DB::beginTransaction();
+
+        try {
+
+            /*
+        |--------------------------------------------------------------------------
+        | Generate unique username
+        |--------------------------------------------------------------------------
+        */
+
+            $usernameBase = strtolower(
+                preg_replace(
+                    '/[^a-zA-Z0-9]/',
+                    '',
+                    $validated['first_name']
+                        ?? $validated['full_name']
+                )
+            );
+
+            if (empty($usernameBase)) {
+                $usernameBase = 'student';
+            }
+
+            $username = $usernameBase;
+            $counter = 1;
+
+            while (User::where('username', $username)->exists()) {
+                $username = $usernameBase . $counter;
+                $counter++;
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Generate unique student code
+        |--------------------------------------------------------------------------
+        */
+
+            do {
+                $code = 'STU-' . strtoupper(Str::random(8));
+            } while (User::where('code', $code)->exists());
+
+            /*
+        |--------------------------------------------------------------------------
+        | Create User
+        |--------------------------------------------------------------------------
+        */
+
+            $student = new User();
+
+            $student->name = $validated['full_name'];
+            $student->username = $username;
+
+            // Parent email is used temporarily for the account.
+            // We will address duplicate parent emails separately if needed.
+            $student->email = $validated['parent_email'];
+
+            $student->phone = $validated['parent_phone'];
+            $student->dob = $validated['date_of_birth'];
+            $student->gender = $validated['gender'];
+            $student->address = $validated['address'] ?? null;
+
+            $student->code = $code;
+            $student->user_type = 'student';
+
+            // Student cannot log in until admin approves.
+            $student->is_approved = false;
+
+            // Random temporary password.
+            $student->password = Hash::make(Str::random(16));
+
+            $student->save();
+
+            /*
+        |--------------------------------------------------------------------------
+        | Create application and link it to the User
+        |--------------------------------------------------------------------------
+        */
+
+            $application = StudentApplication::create([
+                ...$validated,
+
+                'user_id' => $student->id,
+
+                'application_number' => $this->generateApplicationNumber(),
+
+                'status' => 'pending',
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            throw $e;
+        }
 
         return redirect()
             ->route('studentregistration')

@@ -208,6 +208,18 @@ class UserController extends Controller
         return back()->with('success', 'Teacher approved successfully.');
     }
 
+    public function approveStudent(User $user)
+    {
+        if ($user->user_type !== 'student') {
+            abort(404);
+        }
+
+        $user->is_approved = true;
+        $user->save();
+
+        return back()->with('success', 'Student approved successfully.');
+    }
+
     public function teacherRegistration()
     {
         $d['user_types'] = $this->user->getAllTypes();

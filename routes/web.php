@@ -1,12 +1,19 @@
 <?php
 
-use App\Http\Controllers\Admin\NewsController; // <- Import NewsController
+use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\CourseMaterialController;
 use App\Http\Controllers\SupportTeam\StudentApplicationController;
 use App\Http\Controllers\SupportTeam\TimetableAdminController;
 use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Route; // <- ADD THIS IMPORT AT THE TOP
+use Illuminate\Support\Facades\Route;
+
+
+/*
+|--------------------------------------------------------------------------
+| Admin Timetable Management
+|--------------------------------------------------------------------------
+*/
 
 Route::get(
     '/timetable-management',
@@ -52,6 +59,13 @@ Route::get(
 )
     ->name('my-timetable');
 
+
+/*
+|--------------------------------------------------------------------------
+| Test Email
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/test-email', function () {
 
     Mail::to('mahdismahi.13@gmail.com')->send(
@@ -70,292 +84,1073 @@ Route::get('/test-email', function () {
     return 'Test email sent!';
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
+
 Auth::routes();
 
-Route::get('/studentregistration', 'SupportTeam\StudentApplicationController@create')
+
+/*
+|--------------------------------------------------------------------------
+| Student Registration
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/studentregistration',
+    'SupportTeam\StudentApplicationController@create'
+)
     ->name('studentregistration');
 
-Route::post('/studentregistration', 'SupportTeam\StudentApplicationController@storePublic')
+
+Route::post(
+    '/studentregistration',
+    'SupportTeam\StudentApplicationController@storePublic'
+)
     ->name('student.registration.store');
 
-Route::patch(
-    '/student-applications/{id}/approve',
-    [StudentApplicationController::class, 'approve']
-)->name('student-applications.approve');
 
-Route::get('/teacherregrstarsion', 'SupportTeam\UserController@teacherRegistration')
+/*
+|--------------------------------------------------------------------------
+| Teacher Registration
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/teacherregrstarsion',
+    'SupportTeam\UserController@teacherRegistration'
+)
     ->name('teacherregrstarsion');
 
-Route::post('/teacherregrstarsion', 'SupportTeam\UserController@registerTeacher')
-    ->name('teacher.registration.store');
-//Route::get('/test', 'TestController@index')->name('test');
-Route::get('/privacy-policy', 'HomeController@privacy_policy')->name('privacy_policy');
-Route::get('/terms-of-use', 'HomeController@terms_of_use')->name('terms_of_use');
 
+Route::post(
+    '/teacherregrstarsion',
+    'SupportTeam\UserController@registerTeacher'
+)
+    ->name('teacher.registration.store');
+
+
+/*
+|--------------------------------------------------------------------------
+| Other Public Pages
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/privacy-policy',
+    'HomeController@privacy_policy'
+)
+    ->name('privacy_policy');
+
+
+Route::get(
+    '/terms-of-use',
+    'HomeController@terms_of_use'
+)
+    ->name('terms_of_use');
+
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::group(['middleware' => 'auth'], function () {
 
-    Route::get('/', 'HomeController@dashboard')->name('home');
-    Route::get('/home', 'HomeController@dashboard')->name('home');
-    Route::get('/dashboard', 'HomeController@dashboard')->name('dashboard');
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/',
+        'HomeController@dashboard'
+    )->name('home');
+
+    Route::get(
+        '/home',
+        'HomeController@dashboard'
+    )->name('home');
+
+    Route::get(
+        '/dashboard',
+        'HomeController@dashboard'
+    )->name('dashboard');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | My Account
+    |--------------------------------------------------------------------------
+    */
 
     Route::group(['prefix' => 'my_account'], function () {
-        Route::get('/', 'MyAccountController@edit_profile')->name('my_account');
-        Route::put('/', 'MyAccountController@update_profile')->name('my_account.update');
-        Route::put('/change_password', 'MyAccountController@change_pass')->name('my_account.change_pass');
+
+        Route::get(
+            '/',
+            'MyAccountController@edit_profile'
+        )->name('my_account');
+
+        Route::put(
+            '/',
+            'MyAccountController@update_profile'
+        )->name('my_account.update');
+
+        Route::put(
+            '/change_password',
+            'MyAccountController@change_pass'
+        )->name('my_account.change_pass');
     });
 
-    /*************** Support Team *****************/
-    Route::group(['namespace' => 'SupportTeam',], function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Support Team
+    |--------------------------------------------------------------------------
+    */
+
+    Route::group(['namespace' => 'SupportTeam'], function () {
+
 
         /*
-|--------------------------------------------------------------------------
-| Student Applications
-|--------------------------------------------------------------------------
-*/
-       
+        |--------------------------------------------------------------------------
+        | Student Applications
+        |--------------------------------------------------------------------------
+        */
 
         Route::group(['prefix' => 'student-applications'], function () {
 
-            Route::get('/', 'StudentApplicationController@index')
+            Route::get(
+                '/',
+                'StudentApplicationController@index'
+            )
                 ->name('student-applications.index');
 
-            Route::get('/{id}/edit', 'StudentApplicationController@edit')
+
+            /*
+            |--------------------------------------------------------------------------
+            | AJAX - Approve Student
+            |--------------------------------------------------------------------------
+            */
+
+            Route::patch(
+                '/{id}/ajax-approve',
+                'StudentApplicationController@ajaxApprove'
+            )
+                ->name('student-applications.ajaxApprove');
+
+
+            Route::get(
+                '/{id}/edit',
+                'StudentApplicationController@edit'
+            )
                 ->name('student-applications.edit');
 
-            Route::put('/{id}', 'StudentApplicationController@update')
+
+            Route::put(
+                '/{id}',
+                'StudentApplicationController@update'
+            )
                 ->name('student-applications.update');
 
-            Route::get('/{id}', 'StudentApplicationController@show')
+
+            Route::get(
+                '/{id}',
+                'StudentApplicationController@show'
+            )
                 ->name('student-applications.show');
 
-            Route::put('/{id}/status', 'StudentApplicationController@updateStatus')
+
+            Route::put(
+                '/{id}/status',
+                'StudentApplicationController@updateStatus'
+            )
                 ->name('student-applications.status');
 
-            Route::delete('/{id}', 'StudentApplicationController@destroy')
+
+            Route::delete(
+                '/{id}',
+                'StudentApplicationController@destroy'
+            )
                 ->name('student-applications.destroy');
         });
 
-        /*************** Dashboard Calendar *****************/
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard Calendar
+        |--------------------------------------------------------------------------
+        */
 
         Route::group(['prefix' => 'calendar'], function () {
 
-            Route::get('/events', 'CalendarController@events')
+            Route::get(
+                '/events',
+                'CalendarController@events'
+            )
                 ->name('calendar.events');
 
-            Route::post('/events', 'CalendarController@store')
+            Route::post(
+                '/events',
+                'CalendarController@store'
+            )
                 ->name('calendar.events.store');
 
-            // routes/web.php
-            Route::put('/events/{event_id}', 'CalendarController@update')->name('calendar.events.update');
-            Route::delete('/events/{event_id}', 'CalendarController@destroy')->name('calendar.events.destroy');
+            Route::put(
+                '/events/{event_id}',
+                'CalendarController@update'
+            )
+                ->name('calendar.events.update');
+
+            Route::delete(
+                '/events/{event_id}',
+                'CalendarController@destroy'
+            )
+                ->name('calendar.events.destroy');
         });
 
-        Route::group(['prefix' => 'timetables/import', 'middleware' => 'teamSAT'], function () {
-            Route::get('/', 'CalendarController@importForm')->name('timetables.import');
-          Route::get('/template', 'CalendarController@importTemplate')->name('timetables.import.template');
-           Route::post('/', 'CalendarController@import')->name('timetables.import.store');
-       });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Timetable Import
+        |--------------------------------------------------------------------------
+        */
+
+        Route::group(
+            [
+                'prefix' => 'timetables/import',
+                'middleware' => 'teamSAT'
+            ],
+            function () {
+
+                Route::get(
+                    '/',
+                    'CalendarController@importForm'
+                )
+                    ->name('timetables.import');
 
 
-        /*************** Students *****************/
+                Route::get(
+                    '/template',
+                    'CalendarController@importTemplate'
+                )
+                    ->name('timetables.import.template');
+
+
+                Route::post(
+                    '/',
+                    'CalendarController@import'
+                )
+                    ->name('timetables.import.store');
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Students
+        |--------------------------------------------------------------------------
+        */
+
         Route::group(['prefix' => 'students'], function () {
-            Route::post('reset_pass', 'StudentRecordController@reset_pass')->name('st.reset_pass');
-            
-            Route::get('graduated', 'StudentRecordController@graduated')->name('students.graduated');
-            Route::put('not_graduated/{id}', 'StudentRecordController@not_graduated')->name('st.not_graduated');
-            Route::get('list/{class_id}', 'StudentRecordController@listByClass')->name('students.list')->middleware('teamSAT');
 
-            /* Promotions */
-            Route::post('promote_selector', 'PromotionController@selector')->name('students.promote_selector');
-            Route::get('promotion/manage', 'PromotionController@manage')->name('students.promotion_manage');
-            Route::delete('promotion/reset/{pid}', 'PromotionController@reset')->name('students.promotion_reset');
-            Route::delete('promotion/reset_all', 'PromotionController@reset_all')->name('students.promotion_reset_all');
-            Route::get('promotion/{fc?}/{fs?}/{tc?}/{ts?}', 'PromotionController@promotion')->name('students.promotion');
-            Route::post('promote/{fc}/{fs}/{tc}/{ts}', 'PromotionController@promote')->name('students.promote');
+            Route::post(
+                'reset_pass',
+                'StudentRecordController@reset_pass'
+            )
+                ->name('st.reset_pass');
+
+
+            Route::get(
+                'graduated',
+                'StudentRecordController@graduated'
+            )
+                ->name('students.graduated');
+
+
+            Route::put(
+                'not_graduated/{id}',
+                'StudentRecordController@not_graduated'
+            )
+                ->name('st.not_graduated');
+
+
+            Route::get(
+                'list/{class_id}',
+                'StudentRecordController@listByClass'
+            )
+                ->name('students.list')
+                ->middleware('teamSAT');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Promotions
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post(
+                'promote_selector',
+                'PromotionController@selector'
+            )
+                ->name('students.promote_selector');
+
+
+            Route::get(
+                'promotion/manage',
+                'PromotionController@manage'
+            )
+                ->name('students.promotion_manage');
+
+
+            Route::delete(
+                'promotion/reset/{pid}',
+                'PromotionController@reset'
+            )
+                ->name('students.promotion_reset');
+
+
+            Route::delete(
+                'promotion/reset_all',
+                'PromotionController@reset_all'
+            )
+                ->name('students.promotion_reset_all');
+
+
+            Route::get(
+                'promotion/{fc?}/{fs?}/{tc?}/{ts?}',
+                'PromotionController@promotion'
+            )
+                ->name('students.promotion');
+
+
+            Route::post(
+                'promote/{fc}/{fs}/{tc}/{ts}',
+                'PromotionController@promote'
+            )
+                ->name('students.promote');
         });
 
-        /*************** Users *****************/
+
+        /*
+        |--------------------------------------------------------------------------
+        | Users
+        |--------------------------------------------------------------------------
+        */
+
         Route::group(['prefix' => 'users'], function () {
-            Route::post('reset_pass', 'UserController@reset_pass')->name('users.reset_pass');
-            Route::patch('approve-teacher/{user}', 'UserController@approveTeacher')
+
+            Route::post(
+                'reset_pass',
+                'UserController@reset_pass'
+            )
+                ->name('users.reset_pass');
+
+
+            Route::patch(
+                'approve-teacher/{user}',
+                'UserController@approveTeacher'
+            )
                 ->name('users.approveTeacher');
+
+
+            Route::patch(
+                'approve-student/{user}',
+                'UserController@approveStudent'
+            )
+                ->name('users.approveStudent');
         });
 
-        /*************** TimeTables *****************/
+
+        /*
+        |--------------------------------------------------------------------------
+        | TimeTables
+        |--------------------------------------------------------------------------
+        */
+
         Route::group(['prefix' => 'timetables'], function () {
-            Route::get('/', 'TimeTableController@index')->name('tt.index');
+
+            Route::get(
+                '/',
+                'TimeTableController@index'
+            )
+                ->name('tt.index');
+
 
             Route::group(['middleware' => 'teamSA'], function () {
-                Route::post('/', 'TimeTableController@store')->name('tt.store');
-                Route::put('/{tt}', 'TimeTableController@update')->name('tt.update');
-                Route::delete('/{tt}', 'TimeTableController@delete')->name('tt.delete');
+
+                Route::post(
+                    '/',
+                    'TimeTableController@store'
+                )
+                    ->name('tt.store');
+
+
+                Route::put(
+                    '/{tt}',
+                    'TimeTableController@update'
+                )
+                    ->name('tt.update');
+
+
+                Route::delete(
+                    '/{tt}',
+                    'TimeTableController@delete'
+                )
+                    ->name('tt.delete');
             });
 
-            /*************** TimeTable Records *****************/
+
+            /*
+            |--------------------------------------------------------------------------
+            | TimeTable Records
+            |--------------------------------------------------------------------------
+            */
+
             Route::group(['prefix' => 'records'], function () {
 
                 Route::group(['middleware' => 'teamSA'], function () {
-                    Route::get('manage/{ttr}', 'TimeTableController@manage')->name('ttr.manage');
-                    Route::post('/', 'TimeTableController@store_record')->name('ttr.store');
-                    Route::get('edit/{ttr}', 'TimeTableController@edit_record')->name('ttr.edit');
-                    Route::put('/{ttr}', 'TimeTableController@update_record')->name('ttr.update');
+
+                    Route::get(
+                        'manage/{ttr}',
+                        'TimeTableController@manage'
+                    )
+                        ->name('ttr.manage');
+
+
+                    Route::post(
+                        '/',
+                        'TimeTableController@store_record'
+                    )
+                        ->name('ttr.store');
+
+
+                    Route::get(
+                        'edit/{ttr}',
+                        'TimeTableController@edit_record'
+                    )
+                        ->name('ttr.edit');
+
+
+                    Route::put(
+                        '/{ttr}',
+                        'TimeTableController@update_record'
+                    )
+                        ->name('ttr.update');
                 });
 
-                Route::get('show/{ttr}', 'TimeTableController@show_record')->name('ttr.show');
-                Route::get('print/{ttr}', 'TimeTableController@print_record')->name('ttr.print');
-                Route::delete('/{ttr}', 'TimeTableController@delete_record')->name('ttr.destroy');
+
+                Route::get(
+                    'show/{ttr}',
+                    'TimeTableController@show_record'
+                )
+                    ->name('ttr.show');
+
+
+                Route::get(
+                    'print/{ttr}',
+                    'TimeTableController@print_record'
+                )
+                    ->name('ttr.print');
+
+
+                Route::delete(
+                    '/{ttr}',
+                    'TimeTableController@delete_record'
+                )
+                    ->name('ttr.destroy');
             });
 
-            /*************** Time Slots *****************/
-            Route::group(['prefix' => 'time_slots', 'middleware' => 'teamSA'], function () {
-                Route::post('/', 'TimeTableController@store_time_slot')->name('ts.store');
-                Route::post('/use/{ttr}', 'TimeTableController@use_time_slot')->name('ts.use');
-                Route::get('edit/{ts}', 'TimeTableController@edit_time_slot')->name('ts.edit');
-                Route::delete('/{ts}', 'TimeTableController@delete_time_slot')->name('ts.destroy');
-                Route::put('/{ts}', 'TimeTableController@update_time_slot')->name('ts.update');
-            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | Time Slots
+            |--------------------------------------------------------------------------
+            */
+
+            Route::group(
+                [
+                    'prefix' => 'time_slots',
+                    'middleware' => 'teamSA'
+                ],
+                function () {
+
+                    Route::post(
+                        '/',
+                        'TimeTableController@store_time_slot'
+                    )
+                        ->name('ts.store');
+
+
+                    Route::post(
+                        '/use/{ttr}',
+                        'TimeTableController@use_time_slot'
+                    )
+                        ->name('ts.use');
+
+
+                    Route::get(
+                        'edit/{ts}',
+                        'TimeTableController@edit_time_slot'
+                    )
+                        ->name('ts.edit');
+
+
+                    Route::delete(
+                        '/{ts}',
+                        'TimeTableController@delete_time_slot'
+                    )
+                        ->name('ts.destroy');
+
+
+                    Route::put(
+                        '/{ts}',
+                        'TimeTableController@update_time_slot'
+                    )
+                        ->name('ts.update');
+                }
+            );
         });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Authenticated Teacher / Course Materials
+        |--------------------------------------------------------------------------
+        */
 
         Route::group(['middleware' => 'auth'], function () {
 
-            // Teacher
-            // Course Materials
-            Route::get('/teacher/course-materials', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@teacherIndex',
-                'as' => 'teacher.course_materials'
-            ]);
+            /*
+            |--------------------------------------------------------------------------
+            | Teacher Course Materials
+            |--------------------------------------------------------------------------
+            */
 
-            Route::get('/teacher/course-materials/create', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@create',
-                'as' => 'teacher.course_materials.create'
-            ]);
+            Route::get(
+                '/teacher/course-materials',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@teacherIndex',
+                    'as' => 'teacher.course_materials'
+                ]
+            );
 
-            Route::post('/teacher/course-materials', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@store',
-                'as' => 'teacher.course_materials.store'
-            ]);
 
-            Route::get('/teacher/course-materials/{id}/edit', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@edit',
-                'as' => 'teacher.course_materials.edit'
-            ]);
+            Route::get(
+                '/teacher/course-materials/create',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@create',
+                    'as' => 'teacher.course_materials.create'
+                ]
+            );
 
-            Route::put('/teacher/course-materials/{id}', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@update',
-                'as' => 'teacher.course_materials.update'
-            ]);
 
-            Route::delete('/teacher/course-materials/{id}', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@destroy',
-                'as' => 'teacher.course_materials.destroy'
-            ]);
+            Route::post(
+                '/teacher/course-materials',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@store',
+                    'as' => 'teacher.course_materials.store'
+                ]
+            );
 
-            Route::get('/course-materials', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@studentIndex',
-                'as' => 'course_materials'
-            ]);
 
-            Route::get('/parent/course-materials', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@parentIndex',
-                'as' => 'parent.course_materials'
-            ]);
+            Route::get(
+                '/teacher/course-materials/{id}/edit',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@edit',
+                    'as' => 'teacher.course_materials.edit'
+                ]
+            );
 
-            Route::get('/course-materials/{id}/download', [
-                'uses' => '\App\Http\Controllers\CourseMaterialController@download',
-                'as' => 'course_materials.download'
-            ]);
+
+            Route::put(
+                '/teacher/course-materials/{id}',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@update',
+                    'as' => 'teacher.course_materials.update'
+                ]
+            );
+
+
+            Route::delete(
+                '/teacher/course-materials/{id}',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@destroy',
+                    'as' => 'teacher.course_materials.destroy'
+                ]
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Student Course Materials
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/course-materials',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@studentIndex',
+                    'as' => 'course_materials'
+                ]
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Parent Course Materials
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/parent/course-materials',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@parentIndex',
+                    'as' => 'parent.course_materials'
+                ]
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Download Course Material
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/course-materials/{id}/download',
+                [
+                    'uses' => '\App\Http\Controllers\CourseMaterialController@download',
+                    'as' => 'course_materials.download'
+                ]
+            );
         });
 
-        /*************** Payments *****************/
+
+        /*
+        |--------------------------------------------------------------------------
+        | Payments
+        |--------------------------------------------------------------------------
+        */
+
         Route::group(['prefix' => 'payments'], function () {
 
-            Route::get('manage/{class_id?}', 'PaymentController@manage')->name('payments.manage');
-            Route::get('invoice/{id}/{year?}', 'PaymentController@invoice')->name('payments.invoice');
-            Route::get('receipts/{id}', 'PaymentController@receipts')->name('payments.receipts');
-            Route::get('pdf_receipts/{id}', 'PaymentController@pdf_receipts')->name('payments.pdf_receipts');
-            Route::post('select_year', 'PaymentController@select_year')->name('payments.select_year');
-            Route::post('select_class', 'PaymentController@select_class')->name('payments.select_class');
-            Route::delete('reset_record/{id}', 'PaymentController@reset_record')->name('payments.reset_record');
-            Route::post('pay_now/{id}', 'PaymentController@pay_now')->name('payments.pay_now');
+            Route::get(
+                'manage/{class_id?}',
+                'PaymentController@manage'
+            )
+                ->name('payments.manage');
+
+
+            Route::get(
+                'invoice/{id}/{year?}',
+                'PaymentController@invoice'
+            )
+                ->name('payments.invoice');
+
+
+            Route::get(
+                'receipts/{id}',
+                'PaymentController@receipts'
+            )
+                ->name('payments.receipts');
+
+
+            Route::get(
+                'pdf_receipts/{id}',
+                'PaymentController@pdf_receipts'
+            )
+                ->name('payments.pdf_receipts');
+
+
+            Route::post(
+                'select_year',
+                'PaymentController@select_year'
+            )
+                ->name('payments.select_year');
+
+
+            Route::post(
+                'select_class',
+                'PaymentController@select_class'
+            )
+                ->name('payments.select_class');
+
+
+            Route::delete(
+                'reset_record/{id}',
+                'PaymentController@reset_record'
+            )
+                ->name('payments.reset_record');
+
+
+            Route::post(
+                'pay_now/{id}',
+                'PaymentController@pay_now'
+            )
+                ->name('payments.pay_now');
         });
 
-        /*************** Pins *****************/
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pins
+        |--------------------------------------------------------------------------
+        */
+
         Route::group(['prefix' => 'pins'], function () {
-            Route::get('create', 'PinController@create')->name('pins.create');
-            Route::get('/', 'PinController@index')->name('pins.index');
-            Route::post('/', 'PinController@store')->name('pins.store');
-            Route::get('enter/{id}', 'PinController@enter_pin')->name('pins.enter');
-            Route::post('verify/{id}', 'PinController@verify')->name('pins.verify');
-            Route::delete('/', 'PinController@destroy')->name('pins.destroy');
+
+            Route::get(
+                'create',
+                'PinController@create'
+            )
+                ->name('pins.create');
+
+
+            Route::get(
+                '/',
+                'PinController@index'
+            )
+                ->name('pins.index');
+
+
+            Route::post(
+                '/',
+                'PinController@store'
+            )
+                ->name('pins.store');
+
+
+            Route::get(
+                'enter/{id}',
+                'PinController@enter_pin'
+            )
+                ->name('pins.enter');
+
+
+            Route::post(
+                'verify/{id}',
+                'PinController@verify'
+            )
+                ->name('pins.verify');
+
+
+            Route::delete(
+                '/',
+                'PinController@destroy'
+            )
+                ->name('pins.destroy');
         });
 
-        /*************** Marks *****************/
+
+        /*
+        |--------------------------------------------------------------------------
+        | Marks
+        |--------------------------------------------------------------------------
+        */
+
         Route::group(['prefix' => 'marks'], function () {
 
-            // FOR teamSA
+            /*
+            |--------------------------------------------------------------------------
+            | Team SA
+            |--------------------------------------------------------------------------
+            */
+
             Route::group(['middleware' => 'teamSA'], function () {
-                Route::get('batch_fix', 'MarkController@batch_fix')->name('marks.batch_fix');
-                Route::put('batch_update', 'MarkController@batch_update')->name('marks.batch_update');
-                Route::get('tabulation/{exam?}/{class?}/{sec_id?}', 'MarkController@tabulation')->name('marks.tabulation');
-                Route::post('tabulation', 'MarkController@tabulation_select')->name('marks.tabulation_select');
-                Route::get('tabulation/print/{exam}/{class}/{sec_id}', 'MarkController@print_tabulation')->name('marks.print_tabulation');
+
+                Route::get(
+                    'batch_fix',
+                    'MarkController@batch_fix'
+                )
+                    ->name('marks.batch_fix');
+
+
+                Route::put(
+                    'batch_update',
+                    'MarkController@batch_update'
+                )
+                    ->name('marks.batch_update');
+
+
+                Route::get(
+                    'tabulation/{exam?}/{class?}/{sec_id?}',
+                    'MarkController@tabulation'
+                )
+                    ->name('marks.tabulation');
+
+
+                Route::post(
+                    'tabulation',
+                    'MarkController@tabulation_select'
+                )
+                    ->name('marks.tabulation_select');
+
+
+                Route::get(
+                    'tabulation/print/{exam}/{class}/{sec_id}',
+                    'MarkController@print_tabulation'
+                )
+                    ->name('marks.print_tabulation');
             });
 
-            // FOR teamSAT
+
+            /*
+            |--------------------------------------------------------------------------
+            | Team SAT
+            |--------------------------------------------------------------------------
+            */
+
             Route::group(['middleware' => 'teamSAT'], function () {
-                Route::get('/', 'MarkController@index')->name('marks.index');
-                Route::get('manage/{exam}/{class}/{section}/{subject}', 'MarkController@manage')->name('marks.manage');
-                Route::put('update/{exam}/{class}/{section}/{subject}', 'MarkController@update')->name('marks.update');
-                Route::put('comment_update/{exr_id}', 'MarkController@comment_update')->name('marks.comment_update');
-                Route::put('skills_update/{skill}/{exr_id}', 'MarkController@skills_update')->name('marks.skills_update');
-                Route::post('selector', 'MarkController@selector')->name('marks.selector');
-                Route::get('bulk/{class?}/{section?}', 'MarkController@bulk')->name('marks.bulk');
-                Route::post('bulk', 'MarkController@bulk_select')->name('marks.bulk_select');
+
+                Route::get(
+                    '/',
+                    'MarkController@index'
+                )
+                    ->name('marks.index');
+
+
+                Route::get(
+                    'manage/{exam}/{class}/{section}/{subject}',
+                    'MarkController@manage'
+                )
+                    ->name('marks.manage');
+
+
+                Route::put(
+                    'update/{exam}/{class}/{section}/{subject}',
+                    'MarkController@update'
+                )
+                    ->name('marks.update');
+
+
+                Route::put(
+                    'comment_update/{exr_id}',
+                    'MarkController@comment_update'
+                )
+                    ->name('marks.comment_update');
+
+
+                Route::put(
+                    'skills_update/{skill}/{exr_id}',
+                    'MarkController@skills_update'
+                )
+                    ->name('marks.skills_update');
+
+
+                Route::post(
+                    'selector',
+                    'MarkController@selector'
+                )
+                    ->name('marks.selector');
+
+
+                Route::get(
+                    'bulk/{class?}/{section?}',
+                    'MarkController@bulk'
+                )
+                    ->name('marks.bulk');
+
+
+                Route::post(
+                    'bulk',
+                    'MarkController@bulk_select'
+                )
+                    ->name('marks.bulk_select');
             });
 
-            Route::get('select_year/{id}', 'MarkController@year_selector')->name('marks.year_selector');
-            Route::post('select_year/{id}', 'MarkController@year_selected')->name('marks.year_select');
-            Route::get('show/{id}/{year}', 'MarkController@show')->name('marks.show');
-            Route::get('print/{id}/{exam_id}/{year}', 'MarkController@print_view')->name('marks.print');
+
+            Route::get(
+                'select_year/{id}',
+                'MarkController@year_selector'
+            )
+                ->name('marks.year_selector');
+
+
+            Route::post(
+                'select_year/{id}',
+                'MarkController@year_selected'
+            )
+                ->name('marks.year_select');
+
+
+            Route::get(
+                'show/{id}/{year}',
+                'MarkController@show'
+            )
+                ->name('marks.show');
+
+
+            Route::get(
+                'print/{id}/{exam_id}/{year}',
+                'MarkController@print_view'
+            )
+                ->name('marks.print');
         });
 
-        Route::resource('students', 'StudentRecordController');
-        Route::resource('users', 'UserController');
-        Route::resource('classes', 'MyClassController');
-        Route::resource('sections', 'SectionController');
-        Route::resource('subjects', 'SubjectController');
-        Route::resource('grades', 'GradeController');
-        Route::resource('exams', 'ExamController');
-        Route::resource('dorms', 'DormController');
-        Route::resource('payments', 'PaymentController');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resources
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource(
+            'students',
+            'StudentRecordController'
+        );
+
+
+        Route::resource(
+            'users',
+            'UserController'
+        );
+
+
+        Route::resource(
+            'classes',
+            'MyClassController'
+        );
+
+
+        Route::resource(
+            'sections',
+            'SectionController'
+        );
+
+
+        Route::resource(
+            'subjects',
+            'SubjectController'
+        );
+
+
+        Route::resource(
+            'grades',
+            'GradeController'
+        );
+
+
+        Route::resource(
+            'exams',
+            'ExamController'
+        );
+
+
+        Route::resource(
+            'dorms',
+            'DormController'
+        );
+
+
+        Route::resource(
+            'payments',
+            'PaymentController'
+        );
     });
 
-    /*************** Admin News *****************/
-    /*************** Admin News *****************/
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin News
+    |--------------------------------------------------------------------------
+    */
+
     Route::prefix('admin')
         ->name('admin.')
         ->group(function () {
-            Route::resource('news', 'Admin\NewsController'); // Specify Admin namespace directly
+
+            Route::resource(
+                'news',
+                'Admin\NewsController'
+            );
         });
 
-    /************************ AJAX ****************************/
+
+    /*
+    |--------------------------------------------------------------------------
+    | AJAX
+    |--------------------------------------------------------------------------
+    */
+
     Route::group(['prefix' => 'ajax'], function () {
-        Route::get('get_lga/{state_id}', 'AjaxController@get_lga')->name('get_lga');
-        Route::get('get_class_sections/{class_id}', 'AjaxController@get_class_sections')->name('get_class_sections');
-        Route::get('get_class_subjects/{class_id}', 'AjaxController@get_class_subjects')->name('get_class_subjects');
+
+        Route::get(
+            'get_lga/{state_id}',
+            'AjaxController@get_lga'
+        )
+            ->name('get_lga');
+
+
+        Route::get(
+            'get_class_sections/{class_id}',
+            'AjaxController@get_class_sections'
+        )
+            ->name('get_class_sections');
+
+
+        Route::get(
+            'get_class_subjects/{class_id}',
+            'AjaxController@get_class_subjects'
+        )
+            ->name('get_class_subjects');
     });
 });
 
-/************************ SUPER ADMIN ****************************/
-Route::group(['namespace' => 'SuperAdmin', 'middleware' => 'super_admin', 'prefix' => 'super_admin'], function () {
 
-    Route::get('/settings', 'SettingController@index')->name('settings');
-    Route::put('/settings', 'SettingController@update')->name('settings.update');
-});
+/*
+|--------------------------------------------------------------------------
+| SUPER ADMIN
+|--------------------------------------------------------------------------
+*/
 
-/************************ PARENT ****************************/
-Route::group(['namespace' => 'MyParent', 'middleware' => 'my_parent',], function () {
+Route::group(
+    [
+        'namespace' => 'SuperAdmin',
+        'middleware' => 'super_admin',
+        'prefix' => 'super_admin'
+    ],
+    function () {
 
-    Route::get('/my_children', 'MyController@children')->name('my_children');
-});
+        Route::get(
+            '/settings',
+            'SettingController@index'
+        )
+            ->name('settings');
+
+
+        Route::put(
+            '/settings',
+            'SettingController@update'
+        )
+            ->name('settings.update');
+    }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| PARENT
+|--------------------------------------------------------------------------
+*/
+
+Route::group(
+    [
+        'namespace' => 'MyParent',
+        'middleware' => 'my_parent',
+    ],
+    function () {
+
+        Route::get(
+            '/my_children',
+            'MyController@children'
+        )
+            ->name('my_children');
+    }
+);
