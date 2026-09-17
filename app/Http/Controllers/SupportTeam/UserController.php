@@ -208,16 +208,23 @@ class UserController extends Controller
         return back()->with('success', 'Teacher approved successfully.');
     }
 
-    public function approveStudent(User $user)
+    public function approveStudent($id)
     {
-        if ($user->user_type !== 'student') {
-            abort(404);
-        }
+        $user = User::findOrFail($id);
 
-        $user->is_approved = true;
+        $user->is_approved = 1;
         $user->save();
 
-        return back()->with('success', 'Student approved successfully.');
+        StudentApplication::where('user_id', $user->id)
+            ->update([
+                'status' => 'accepted',
+                'reviewed_by' => auth()->id(),
+                'reviewed_at' => now(),
+            ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Student approved successfully.');
     }
 
     public function teacherRegistration()
