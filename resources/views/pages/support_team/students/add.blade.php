@@ -275,30 +275,7 @@
                 </div>
 
 
-                <div class="col-md-3">
-                    <div class="form-group">
-
-                        <label for="section_id">
-                            Section : <span class="text-danger">*</span>
-                        </label>
-
-                        <select
-                            data-placeholder="Sélectionnez d'abord une classe"
-                            required
-                            name="section_id"
-                            id="section_id"
-                            class="select-search form-control">
-
-                            <option
-                                {{ (old('section_id')) ? 'selected' : '' }}
-                                value="{{ old('section_id') }}">
-                                {{ (old('section_id')) ? 'Sélectionnée' : '' }}
-                            </option>
-
-                        </select>
-
-                    </div>
-                </div>
+                <input type="hidden" name="section_id" id="section_id" value="1">
 
 
                 <div class="col-md-3">
