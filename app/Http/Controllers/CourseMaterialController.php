@@ -8,6 +8,9 @@ use App\Models\MyClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\NewCourseMail;
+use App\Models\StudentRecord;
+use Illuminate\Support\Facades\Mail;
 
 class CourseMaterialController extends Controller
 {
@@ -49,6 +52,9 @@ class CourseMaterialController extends Controller
     /**
      * Upload material
      */
+    /**
+     * Upload material
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -74,7 +80,8 @@ class CourseMaterialController extends Controller
             'local'
         );
 
-        CourseMaterial::create([
+        // Create the course material
+        $course = CourseMaterial::create([
             'title' => $request->title,
             'description' => $request->description,
             'file_name' => $originalName,
@@ -85,9 +92,28 @@ class CourseMaterialController extends Controller
             'class_id' => $request->class_id,
         ]);
 
+        /*
+     * Get all students belonging to this class
+     */
+        $students = StudentRecord::with('user')
+            ->where('my_class_id', $course->class_id)
+            ->get();
+
+        /*
+     * Send email to every student who has an email address
+     */
+        foreach ($students as $student) {
+
+            if ($student->user && !empty($student->user->email)) {
+
+                Mail::to($student->user->email)
+                    ->send(new NewCourseMail($course));
+            }
+        }
+
         return back()->with(
             'flash_success',
-            'Course material uploaded successfully.'
+            'Course material uploaded successfully and students have been notified.'
         );
     }
 
