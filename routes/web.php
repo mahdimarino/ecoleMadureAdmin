@@ -241,7 +241,7 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::patch(
                 '/{id}/ajax-approve',
-                'StudentApplicationController@ajaxApprove'
+                [StudentApplicationController::class, 'ajaxApprove']
             )
                 ->name('student-applications.ajaxApprove');
 
