@@ -275,7 +275,7 @@
                 </div>
 
 
-                <input type="hidden" name="section_id" id="section_id" value="1">
+                <input type="hidden" name="section_id" value="">
 
 
                 <div class="col-md-3">
