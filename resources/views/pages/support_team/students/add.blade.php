@@ -275,7 +275,26 @@
                 </div>
 
 
-                <input type="hidden" name="section_id" value="5">
+                <div class="col-md-3">
+    <div class="form-group">
+
+        <label for="section_id">
+            Section : <span class="text-danger">*</span>
+        </label>
+
+        <select
+            data-placeholder="Choisir une section..."
+            required
+            name="section_id"
+            id="section_id"
+            class="select-search form-control">
+
+            <option value="">Choisir une classe d'abord</option>
+
+        </select>
+
+    </div>
+</div>
 
 
                 <div class="col-md-3">
