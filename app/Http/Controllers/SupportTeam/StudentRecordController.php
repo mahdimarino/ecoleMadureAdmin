@@ -64,37 +64,62 @@ class StudentRecordController extends Controller
 
     public function store(StudentRecordCreate $req)
     {
-       $data =  $req->only(Qs::getUserRecord());
-       $sr =  $req->only(Qs::getStudentData());
+        try {
 
-        $ct = $this->my_class->findTypeByClass($req->my_class_id)->code;
-       /* $ct = ($ct == 'J') ? 'JSS' : $ct;
-        $ct = ($ct == 'S') ? 'SS' : $ct;*/
+            $data = $req->only(Qs::getUserRecord());
+            $sr = $req->only(Qs::getStudentData());
 
-        $data['user_type'] = 'student';
-        $data['name'] = ucwords($req->name);
-        $data['code'] = strtoupper(Str::random(10));
-        $data['password'] = Hash::make($req->password);
-        $data['photo'] = Qs::getDefaultUserImage();
-        $adm_no = $req->adm_no;
-        $data['username'] = strtoupper(Qs::getAppCode().'/'.$ct.'/'.$sr['year_admitted'].'/'.($adm_no ?: mt_rand(1000, 99999)));
+            $ct = $this->my_class->findTypeByClass($req->my_class_id)->code;
 
-        if($req->hasFile('photo')) {
-            $photo = $req->file('photo');
-            $f = Qs::getFileMetaData($photo);
-            $f['name'] = 'photo.' . $f['ext'];
-            $f['path'] = $photo->storeAs(Qs::getUploadPath('student').$data['code'], $f['name']);
-            $data['photo'] = asset('storage/' . $f['path']);
+            $data['user_type'] = 'student';
+            $data['name'] = ucwords($req->name);
+            $data['code'] = strtoupper(Str::random(10));
+            $data['password'] = Hash::make($req->password);
+            $data['photo'] = Qs::getDefaultUserImage();
+
+            $adm_no = $req->adm_no;
+
+            $data['username'] = strtoupper(
+                Qs::getAppCode() . '/' .
+                    $ct . '/' .
+                    $sr['year_admitted'] . '/' .
+                    ($adm_no ?: mt_rand(1000, 99999))
+            );
+
+            if ($req->hasFile('photo')) {
+
+                $photo = $req->file('photo');
+
+                $f = Qs::getFileMetaData($photo);
+
+                $f['name'] = 'photo.' . $f['ext'];
+
+                $f['path'] = $photo->storeAs(
+                    Qs::getUploadPath('student') . $data['code'],
+                    $f['name']
+                );
+
+                $data['photo'] = asset('storage/' . $f['path']);
+            }
+
+            $user = $this->user->create($data);
+
+            $sr['adm_no'] = $data['username'];
+            $sr['user_id'] = $user->id;
+            $sr['session'] = Qs::getSetting('current_session');
+
+            $this->student->createRecord($sr);
+
+            return Qs::jsonStoreOk();
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 500);
         }
-
-        $user = $this->user->create($data); // Create User
-
-        $sr['adm_no'] = $data['username'];
-        $sr['user_id'] = $user->id;
-        $sr['session'] = Qs::getSetting('current_session');
-
-        $this->student->createRecord($sr); // Create Student
-        return Qs::jsonStoreOk();
     }
 
     public function listByClass($class_id)
