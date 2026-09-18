@@ -25,47 +25,33 @@ class StudentApplicationController extends Controller
 
     public function ajaxApprove($id)
     {
-        $application = StudentApplication::findOrFail($id);
-
-        if (!$application->user_id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No student user is linked to this application.',
-            ], 422);
-        }
-
-        $student = User::find($application->user_id);
-
-        if (!$student) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Student user not found.',
-            ], 404);
-        }
+        $student = User::findOrFail($id);
 
         if ($student->user_type !== 'student') {
             return response()->json([
                 'success' => false,
-                'message' => 'The linked user is not a student.',
+                'message' => 'The selected user is not a student.',
             ], 422);
         }
 
         $student->is_approved = 1;
         $student->save();
 
-        $application->status      = 'accepted';
-        $application->reviewed_by = Auth::id();
-        $application->reviewed_at = now();
-        $application->save();
+        $application = StudentApplication::where('user_id', $student->id)->first();
+
+        if ($application) {
+            $application->status = 'accepted';
+            $application->reviewed_by = Auth::id();
+            $application->reviewed_at = now();
+            $application->save();
+        }
 
         return response()->json([
-            'success'        => true,
-            'message'        => 'Student approved successfully.',
-            'student_id'     => $student->id,
-            'application_id' => $application->id,
+            'success' => true,
+            'message' => 'Student approved successfully.',
+            'student_id' => $student->id,
         ]);
     }
-
     /**
      * Handle the public student registration submission.
      * Creates a pending StudentApplication for the admin to review/approve.

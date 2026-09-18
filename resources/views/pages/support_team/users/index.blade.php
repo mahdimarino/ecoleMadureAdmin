@@ -691,9 +691,10 @@
 
                                             <div class="dropdown">
 
-                                                <a href="#"
-                                                   class="list-icons-item"
-                                                   data-toggle="dropdown">
+                                                <a
+                                                    href="#"
+                                                    class="list-icons-item"
+                                                    data-toggle="dropdown">
 
                                                     <i class="icon-menu9"></i>
 
@@ -766,6 +767,7 @@
                                                             </form>
 
                                                         @endif
+
 
                                                     {{-- ================================================= --}}
                                                     {{-- STUDENT APPROVAL --}}
@@ -1030,7 +1032,7 @@
 
 
                                                 {{-- ================================================= --}}
-                                                {{-- AJAX APPROVE STUDENT --}}
+                                                {{-- STUDENT APPROVAL --}}
                                                 {{-- ================================================= --}}
 
                                                 @if($app->user_id)
@@ -1047,17 +1049,25 @@
 
                                                     @else
 
-                                                        <button
-                                                            type="button"
-                                                            class="dropdown-item text-success approve-student-btn"
-                                                            data-id="{{ $app->id }}"
-                                                            data-url="{{ route('student-applications.ajaxApprove', $app->id) }}">
+                                                        <form
+                                                            method="POST"
+                                                            action="{{ route('users.approveStudent', $app->user_id) }}">
 
-                                                            <i class="icon-check"></i>
+                                                            @csrf
 
-                                                            Approve Student
+                                                            @method('PATCH')
 
-                                                        </button>
+                                                            <button
+                                                                type="submit"
+                                                                class="dropdown-item text-success">
+
+                                                                <i class="icon-check"></i>
+
+                                                                Approve Student
+
+                                                            </button>
+
+                                                        </form>
 
                                                     @endif
 
@@ -1262,12 +1272,6 @@
 
 <script>
 
-    /*
-    |--------------------------------------------------------------------------
-    | Reset Password Modal
-    |--------------------------------------------------------------------------
-    */
-
     $('#resetUserPasswordModal').on(
         'show.bs.modal',
         function(event) {
@@ -1281,165 +1285,6 @@
             $('#reset_user_name').text(
                 button.data('user-name')
             );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | AJAX STUDENT APPROVAL
-    |--------------------------------------------------------------------------
-    */
-
-    $(document).on(
-        'click',
-        '.approve-student-btn',
-        function(e) {
-
-            e.preventDefault();
-
-            var button = $(this);
-
-            var url = button.data('url');
-
-            var row = button.closest('tr');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Prevent double click
-            |--------------------------------------------------------------------------
-            */
-
-            button.prop('disabled', true);
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Loading state
-            |--------------------------------------------------------------------------
-            */
-
-            button.html(
-                '<i class="icon-spinner2 spinner"></i> Approving...'
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | AJAX REQUEST
-            |--------------------------------------------------------------------------
-            */
-
-            $.ajax({
-
-                url: url,
-
-                type: 'PATCH',
-
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SUCCESS
-                |--------------------------------------------------------------------------
-                */
-
-                success: function(response) {
-
-                    if (response.success) {
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Update Status Badge
-                        |--------------------------------------------------------------------------
-                        */
-
-                        row.find('.application-status').html(
-                            '<span class="badge badge-success">' +
-                                'Approved' +
-                            '</span>'
-                        );
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Replace Approve Button
-                        |--------------------------------------------------------------------------
-                        */
-
-                        button.replaceWith(
-                            '<span class="dropdown-item text-success">' +
-                                '<i class="icon-check"></i> ' +
-                                'Approved' +
-                            '</span>'
-                        );
-
-                    } else {
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Failed response
-                        |--------------------------------------------------------------------------
-                        */
-
-                        button.prop('disabled', false);
-
-                        button.html(
-                            '<i class="icon-check"></i> ' +
-                            'Approve Student'
-                        );
-
-                        alert(
-                            response.message ||
-                            'Unable to approve student.'
-                        );
-
-                    }
-
-                },
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | ERROR
-                |--------------------------------------------------------------------------
-                */
-
-                error: function(xhr) {
-
-                    button.prop('disabled', false);
-
-                    button.html(
-                        '<i class="icon-check"></i> ' +
-                        'Approve Student'
-                    );
-
-
-                    var message =
-                        'Unable to approve student.';
-
-
-                    if (
-                        xhr.responseJSON &&
-                        xhr.responseJSON.message
-                    ) {
-
-                        message =
-                            xhr.responseJSON.message;
-
-                    }
-
-
-                    alert(message);
-
-                }
-
-            });
 
         }
     );

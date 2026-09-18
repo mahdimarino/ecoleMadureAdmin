@@ -46,7 +46,16 @@ Route::delete(
     ->name('admin-timetable.destroy')
     ->middleware('teamSA');
 
+Route::get('/test-student/{id}', function ($id) {
+    $application = \App\Models\StudentApplication::find($id);
 
+    return response()->json([
+        'id_received' => $id,
+        'database' => \DB::connection()->getDatabaseName(),
+        'found' => $application !== null,
+        'application' => $application,
+    ]);
+});
 /*
 |--------------------------------------------------------------------------
 | Student / Parent
