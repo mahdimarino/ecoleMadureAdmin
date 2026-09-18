@@ -682,7 +682,9 @@
                                                                     Approve Student
                                                                 </button>
                                                             @endif
+                                                            
                                                         @endif
+
 
 
                                                         {{-- ================================================= --}}
@@ -908,6 +910,29 @@
     View Application
 
 </button>
+@if (Qs::userIsSuperAdmin())
+    <a id="app-{{ $app->id }}"
+        onclick="confirmDelete(this.id)"
+        href="#"
+        class="dropdown-item text-danger">
+
+        <i class="icon-trash"></i>
+
+        Delete Application
+
+    </a>
+
+
+    <form method="post"
+        id="item-delete-app-{{ $app->id }}"
+        action="{{ route('student-applications.destroy', $app->id) }}"
+        class="hidden">
+
+        @csrf
+        @method('delete')
+
+    </form>
+@endif
 
 
                                                     {{-- EDIT --}}
