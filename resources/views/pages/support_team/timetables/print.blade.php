@@ -35,11 +35,11 @@
 <div class="container">
     <div id="print" xmlns:margin-top="http://www.w3.org/1999/xhtml">
         {{--    Logo N School Details--}}
-        <table width="100%">
+        {{-- <table width="100%">
             <tr>
                 <td >
                     <strong><span style="color: #1b0c80; font-size: 25px;">{{ strtoupper(config('app.name')) }}</span></strong><br/>
-                    {{-- <strong><span style="color: #1b0c80; font-size: 20px;">MINNA, NIGER STATE</span></strong><br/>--}}
+                    <strong><span style="color: #1b0c80; font-size: 20px;">MINNA, NIGER STATE</span></strong><br/>
                     <strong><span style="color: #000; font-size: 15px;"><i>{{ ucwords($s['address']) }}</i></span></strong><br/>
                     <strong><span style="color: #000; text-decoration: underline; font-size: 15px;"><i>{{ config('app.url') }}/i></span></strong>
                     <br /> <br />
@@ -47,7 +47,7 @@
                     </span></strong>
                 </td>
             </tr>
-        </table>
+        </table> --}}
 
         {{--Background Logo--}}
         {{-- <div style="position: relative;  text-align: center; ">
