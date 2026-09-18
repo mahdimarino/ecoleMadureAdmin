@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\SupportTeam;
 
+use App\Helpers\Qs;
 use App\Http\Controllers\Controller;
 use App\Models\StudentApplication;
+use App\Models\StudentRecord;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use App\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class StudentApplicationController extends Controller
@@ -404,15 +406,9 @@ class StudentApplicationController extends Controller
     /**
      * Display one application.
      */
-    public function show(Request $request)
+    public function show($id)
     {
-        $id = basename($request->path());
-
-        $application = StudentApplication::find($id);
-
-        if (!$application) {
-            abort(404);
-        }
+        $application = StudentApplication::findOrFail($id);
 
         return view('pages.admin.student-applications.show', [
             'application' => $application
@@ -468,12 +464,121 @@ class StudentApplicationController extends Controller
     {
         $application = StudentApplication::findOrFail($id);
 
+        /*
+    |--------------------------------------------------------------------------
+    | Prevent approving the same application twice
+    |--------------------------------------------------------------------------
+    */
+        if ($application->status === 'accepted' && $application->user_id) {
+
+            $existingStudent = StudentRecord::where(
+                'user_id',
+                $application->user_id
+            )->first();
+
+            if ($existingStudent) {
+                return back()->with(
+                    'success',
+                    'This student has already been approved and added to the student list.'
+                );
+            }
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Create or find the student User
+    |--------------------------------------------------------------------------
+    */
+
+        $user = null;
+
+        if ($application->user_id) {
+            $user = User::find($application->user_id);
+        }
+
+        /*
+    | If the application doesn't already have a user,
+    | create one now.
+    */
+        if (!$user) {
+
+            $user = User::create([
+                'name' => $application->full_name,
+                'username' => strtoupper(Str::random(10)),
+                'code' => strtoupper(Str::random(10)),
+                'user_type' => 'student',
+                'password' => Hash::make(Str::random(12)),
+                'photo' => $application->photo ?: Qs::getDefaultUserImage(),
+            ]);
+
+            $application->user_id = $user->id;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Create the normal Student Record
+    |--------------------------------------------------------------------------
+    */
+
+        $studentExists = StudentRecord::where(
+            'user_id',
+            $user->id
+        )->exists();
+
+        if (!$studentExists) {
+
+            StudentRecord::create([
+                'user_id' => $user->id,
+
+                'session' => Qs::getSetting('current_session'),
+
+                'adm_no' => $application->application_number,
+
+                'year_admitted' => date(
+                    'Y',
+                    strtotime(
+                        $application->academic_year ?: now()
+                    )
+                ),
+
+                /*
+             * These can be assigned later from the normal
+             * student edit page if they are not known yet.
+             */
+                'my_class_id' => null,
+                'section_id' => null,
+                'my_parent_id' => null,
+                'dorm_id' => null,
+                'dorm_room_no' => null,
+
+                'wd' => 0,
+                'wd_date' => null,
+
+                'grad' => 0,
+                'grad_date' => null,
+
+                'house' => null,
+                'age' => $application->date_of_birth
+                    ? $application->date_of_birth->age
+                    : null,
+            ]);
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Mark application as accepted
+    |--------------------------------------------------------------------------
+    */
+
         $application->status = 'accepted';
+        $application->reviewed_by = Auth::id();
+        $application->reviewed_at = now();
+
         $application->save();
 
         return back()->with(
             'success',
-            'Student approved successfully.'
+            'Student approved successfully and added to the student list.'
         );
     }
 }

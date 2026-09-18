@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\SupportTeam;
 
+use Illuminate\Support\Facades\DB;
 use App\Helpers\Qs;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
+use App\Models\Section;
+use App\Models\StudentApplication;
+use App\Models\StudentRecord;
 use App\Repositories\LocationRepo;
 use App\Repositories\MyClassRepo;
 use App\Repositories\UserRepo;
@@ -14,7 +18,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Models\StudentApplication;
 
 class UserController extends Controller
 {
@@ -22,8 +25,8 @@ class UserController extends Controller
 
     public function __construct(UserRepo $user, LocationRepo $loc, MyClassRepo $my_class)
     {
-        $this->middleware('teamSA', ['only' => ['index', 'store', 'edit', 'update'] ]);
-        $this->middleware('super_admin', ['only' => ['reset_pass','destroy'] ]);
+        $this->middleware('teamSA', ['only' => ['index', 'store', 'edit', 'update']]);
+        $this->middleware('super_admin', ['only' => ['reset_pass', 'destroy']]);
 
         $this->user = $user;
         $this->loc = $loc;
@@ -36,7 +39,8 @@ class UserController extends Controller
         $ut2 = $ut->where('level', '>', 2);
 
         $d['user_types'] = Qs::userIsAdmin() ? $ut2 : $ut;
-
+        $d['my_classes'] = $this->my_class->all();
+        $d['my_classes']->load('section');
         $d['states'] = $this->loc->getStates();
 
         $d['users'] = $this->user->getPTAUsers();
@@ -138,8 +142,8 @@ class UserController extends Controller
             'gender'   => 'required|string',
             'address'  => 'required|string|max:255',
             'nal_id'   => 'required',
-            'state_id' => 'required',
-            'lga_id'   => 'required',
+            'state_id' => 'nullable',
+            'lga_id'   => 'nullable',
             'bg_id'    => 'nullable',
             'emp_date' => 'nullable',
             'photo'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -208,23 +212,98 @@ class UserController extends Controller
         return back()->with('success', 'Teacher approved successfully.');
     }
 
-    public function approveStudent($id)
+    public function approveStudent(Request $request, $id)
     {
+        $request->validate([
+            'my_class_id' => 'required|exists:my_classes,id',
+            'section_id' => 'required|exists:sections,id',
+        ]);
+
         $user = User::findOrFail($id);
 
-        $user->is_approved = 1;
-        $user->save();
+        if ($user->user_type !== 'student') {
+            abort(404);
+        }
 
-        StudentApplication::where('user_id', $user->id)
-            ->update([
-                'status' => 'accepted',
-                'reviewed_by' => auth()->id(),
-                'reviewed_at' => now(),
+        // Make sure the section belongs to the selected class
+        $section = Section::where('id', $request->section_id)
+            ->where('my_class_id', $request->my_class_id)
+            ->where('active', 1)
+            ->first();
+
+        if (!$section) {
+            return back()->with(
+                'pop_error',
+                'The selected section does not belong to this class or is inactive.'
+            );
+        }
+
+        // Don't create a duplicate StudentRecord
+        if (StudentRecord::where('user_id', $user->id)->exists()) {
+
+            $user->is_approved = 1;
+            $user->save();
+
+            return back()->with(
+                'success',
+                'Student is already assigned to a class and has been approved.'
+            );
+        }
+
+        $application = StudentApplication::where('user_id', $user->id)->first();
+
+        DB::transaction(function () use (
+            $request,
+            $user,
+            $application
+        ) {
+
+            /*
+        |--------------------------------------------------------------------------
+        | Create normal StudentRecord
+        |--------------------------------------------------------------------------
+        */
+
+            StudentRecord::create([
+                'user_id'      => $user->id,
+                'my_class_id'  => $request->my_class_id,
+                'section_id'   => $request->section_id,
+                'adm_no'       => $user->username,
+                'session'      => Qs::getSetting('current_session'),
+                'year_admitted' => $application?->academic_year ?: date('Y'),
+                'age'          => $user->dob
+                    ? \Carbon\Carbon::parse($user->dob)->age
+                    : null,
+                'grad'         => 0,
             ]);
 
-        return redirect()
-            ->back()
-            ->with('success', 'Student approved successfully.');
+            /*
+        |--------------------------------------------------------------------------
+        | Approve User
+        |--------------------------------------------------------------------------
+        */
+
+            $user->is_approved = 1;
+            $user->save();
+
+            /*
+        |--------------------------------------------------------------------------
+        | Approve Application
+        |--------------------------------------------------------------------------
+        */
+
+            if ($application) {
+                $application->status = 'accepted';
+                $application->reviewed_by = auth()->id();
+                $application->reviewed_at = now();
+                $application->save();
+            }
+        });
+
+        return back()->with(
+            'success',
+            'Student approved and added to the selected class successfully.'
+        );
     }
 
     public function teacherRegistration()
@@ -250,29 +329,29 @@ class UserController extends Controller
         $user_is_staff = in_array($user_type, Qs::getStaff());
         $user_is_teamSA = in_array($user_type, Qs::getTeamSA());
 
-        $staff_id = Qs::getAppCode().'/STAFF/'.date('Y/m', strtotime($req->emp_date)).'/'.mt_rand(1000, 9999);
+        $staff_id = Qs::getAppCode() . '/STAFF/' . date('Y/m', strtotime($req->emp_date)) . '/' . mt_rand(1000, 9999);
         $data['username'] = $uname = ($user_is_teamSA) ? $req->username : $staff_id;
 
         $pass = $req->password ?: $user_type;
         $data['password'] = Hash::make($pass);
 
-        if($req->hasFile('photo')) {
+        if ($req->hasFile('photo')) {
             $photo = $req->file('photo');
             $f = Qs::getFileMetaData($photo);
             $f['name'] = 'photo.' . $f['ext'];
-            $f['path'] = $photo->storeAs(Qs::getUploadPath($user_type).$data['code'], $f['name']);
+            $f['path'] = $photo->storeAs(Qs::getUploadPath($user_type) . $data['code'], $f['name']);
             $data['photo'] = asset('storage/' . $f['path']);
         }
 
         /* Ensure that both username and Email are not blank*/
-        if(!$uname && !$req->email){
+        if (!$uname && !$req->email) {
             return back()->with('pop_error', __('msg.user_invalid'));
         }
 
         $user = $this->user->create($data); // Create User
 
         /* CREATE STAFF RECORD */
-        if($user_is_staff){
+        if ($user_is_staff) {
             $d2 = $req->only(Qs::getStaffRecord());
             $d2['user_id'] = $user->id;
             $d2['code'] = $staff_id;
@@ -287,7 +366,7 @@ class UserController extends Controller
         $id = Qs::decodeHash($id);
 
         // Redirect if Making Changes to Head of Super Admins
-        if(Qs::headSA($id)){
+        if (Qs::headSA($id)) {
             return Qs::json(__('msg.denied'), FALSE);
         }
 
@@ -301,25 +380,24 @@ class UserController extends Controller
         $data['name'] = ucwords($req->name);
         $data['user_type'] = $user_type;
 
-        if($user_is_staff && !$user_is_teamSA){
-            $data['username'] = Qs::getAppCode().'/STAFF/'.date('Y/m', strtotime($req->emp_date)).'/'.mt_rand(1000, 9999);
-        }
-        else {
+        if ($user_is_staff && !$user_is_teamSA) {
+            $data['username'] = Qs::getAppCode() . '/STAFF/' . date('Y/m', strtotime($req->emp_date)) . '/' . mt_rand(1000, 9999);
+        } else {
             $data['username'] = $user->username;
         }
 
-        if($req->hasFile('photo')) {
+        if ($req->hasFile('photo')) {
             $photo = $req->file('photo');
             $f = Qs::getFileMetaData($photo);
             $f['name'] = 'photo.' . $f['ext'];
-            $f['path'] = $photo->storeAs(Qs::getUploadPath($user_type).$user->code, $f['name']);
+            $f['path'] = $photo->storeAs(Qs::getUploadPath($user_type) . $user->code, $f['name']);
             $data['photo'] = asset('storage/' . $f['path']);
         }
 
         $this->user->update($id, $data);   /* UPDATE USER RECORD */
 
         /* UPDATE STAFF RECORD */
-        if($user_is_staff){
+        if ($user_is_staff) {
             $d2 = $req->only(Qs::getStaffRecord());
             $d2['code'] = $data['username'];
             $this->user->updateStaffRecord(['user_id' => $id], $d2);
@@ -331,12 +409,14 @@ class UserController extends Controller
     public function show($user_id)
     {
         $user_id = Qs::decodeHash($user_id);
-        if(!$user_id){return back();}
+        if (!$user_id) {
+            return back();
+        }
 
         $data['user'] = $this->user->find($user_id);
 
         /* Prevent Other Students from viewing Profile of others*/
-        if(Auth::user()->id != $user_id && !Qs::userIsTeamSAT() && !Qs::userIsMyChild(Auth::user()->id, $user_id)){
+        if (Auth::user()->id != $user_id && !Qs::userIsTeamSAT() && !Qs::userIsMyChild(Auth::user()->id, $user_id)) {
             return redirect(route('dashboard'))->with('pop_error', __('msg.denied'));
         }
 
@@ -348,17 +428,17 @@ class UserController extends Controller
         $id = Qs::decodeHash($id);
 
         // Redirect if Making Changes to Head of Super Admins
-        if(Qs::headSA($id)){
+        if (Qs::headSA($id)) {
             return back()->with('pop_error', __('msg.denied'));
         }
 
         $user = $this->user->find($id);
 
-        if($user->user_type == 'teacher' && $this->userTeachesSubject($user)) {
+        if ($user->user_type == 'teacher' && $this->userTeachesSubject($user)) {
             return back()->with('pop_error', __('msg.del_teacher'));
         }
 
-        $path = Qs::getUploadPath($user->user_type).$user->code;
+        $path = Qs::getUploadPath($user->user_type) . $user->code;
         Storage::exists($path) ? Storage::deleteDirectory($path) : true;
         $this->user->delete($user->id);
 
@@ -370,5 +450,4 @@ class UserController extends Controller
         $subjects = $this->my_class->findSubjectByTeacher($user->id);
         return ($subjects->count() > 0) ? true : false;
     }
-
 }

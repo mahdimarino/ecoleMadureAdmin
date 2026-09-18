@@ -85,7 +85,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        {{-- <div class="col-md-3">
                             <label for="state_id">State: <span class="text-danger">*</span></label>
                             <select onchange="getLGA(this.value)" required data-placeholder="Choose.." class="select-search form-control" name="state_id" id="state_id">
                                 <option value=""></option>
@@ -102,7 +102,7 @@
                                     <option selected value="{{ $sr->user->lga_id }}">{{ $sr->user->lga->name}}</option>
                                 @endif
                             </select>
-                        </div>
+                        </div> --}}
 
                     </div>
                     <div class="row">
@@ -178,25 +178,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="dorm_id">Dormitory: </label>
-                            <select data-placeholder="Choose..."  name="dorm_id" id="dorm_id" class="select-search form-control">
-                                <option value=""></option>
-                                @foreach($dorms as $d)
-                                    <option {{ ($sr->dorm_id == $d->id) ? 'selected' : '' }} value="{{ $d->id }}">{{ $d->name }}</option>
-                                @endforeach
-                            </select>
-
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Dormitory Room No:</label>
-                                <input type="text" name="dorm_room_no" placeholder="Dormitory Room No" class="form-control" value="{{ $sr->dorm_room_no }}">
-                            </div>
-                        </div>
-                    </div>
+                    
                 </fieldset>
 
             </form>

@@ -112,7 +112,7 @@
                         </ul>
                     </li> --}}
                     {{-- Student Applications --}}
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('student-applications.index') }}"
                             class="nav-link {{ in_array(Route::currentRouteName(), ['student-applications.index', 'student-applications.show'])
                                 ? 'active'
@@ -121,7 +121,7 @@
                             <i class="icon-file-text2"></i>
                             <span>Demandes d'inscription</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     {{-- Manage News --}}
                     <li
@@ -333,19 +333,19 @@
                 @endif
 
                 {{-- Exam --}}
-               @if (Qs::userIsTeamSA())
+               {{-- @if (Qs::userIsTeamSA())
                     <li
                         class="nav-item nav-item-submenu {{ in_array(Route::currentRouteName(), ['exams.index', 'exams.edit', 'grades.index', 'grades.edit', 'marks.index', 'marks.manage', 'marks.bulk', 'marks.tabulation', 'marks.show', 'marks.batch_fix']) ? 'nav-item-expanded nav-item-open' : '' }} ">
-                        <a href="#" class="nav-link"><i class="icon-books"></i> <span> Examens</span></a>
+                        <a href="#" class="nav-link"><i class="icon-books"></i> <span> Examens</span></a> --}}
 
-                        <ul class="nav nav-group-sub" data-submenu-title="Gérer les examens">
-                            @if (Qs::userIsTeamSA())
+                        {{-- <ul class="nav nav-group-sub" data-submenu-title="Gérer les examens">
+                            @if (Qs::userIsTeamSA()) --}}
                                 {{-- Exam list --}}
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a href="{{ route('exams.index') }}"
                                         class="nav-link {{ Route::is('exams.index') ? 'active' : '' }}">Liste des
                                         examens</a>
-                                </li>
+                                </li> --}}
 
                                 {{-- Grades list --}}
                                 {{-- <li class="nav-item">
@@ -367,9 +367,9 @@
                                         class="nav-link {{ in_array(Route::currentRouteName(), ['marks.batch_fix']) ? 'active' : '' }}">Correction
                                         par lot</a>
                                 </li> --}}
-                            @endif
+                            {{-- @endif --}}
 
-                            @if (Qs::userIsTeamSAT())
+                            {{-- @if (Qs::userIsTeamSAT()) --}}
                                 {{-- Marks Manage --}}
                                 {{-- <li class="nav-item">
                                     <a href="{{ route('marks.index') }}"
@@ -382,11 +382,11 @@
                                         class="nav-link {{ in_array(Route::currentRouteName(), ['marks.bulk', 'marks.show']) ? 'active' : '' }}">Bulletin
                                         scolaire</a>
                                 </li> --}}
-                            @endif
-
+                            {{-- @endif --}}
+{{-- 
                         </ul>
                     </li>
-                @endif
+                @endif --}}
 
 
                 {{-- End Exam --}}

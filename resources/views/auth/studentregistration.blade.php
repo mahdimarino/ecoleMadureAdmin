@@ -366,6 +366,13 @@
                         <input type="text" name="place_of_birth" value="{{ old('place_of_birth') }}"
                                placeholder="Ville de naissance" class="student-reg-input">
                     </div>
+                    <div class="student-reg-field">
+                        <label class="student-reg-label">
+                            E-mail du parent <span class="student-reg-required">*</span>
+                        </label>
+                        <input type="email" name="parent_email" value="{{ old('parent_email') }}"
+                               placeholder="parent@email.com" class="student-reg-input" required>
+                    </div>
 
                     {{-- SEXE --}}
                     <div class="student-reg-field">
@@ -535,13 +542,7 @@
                                placeholder="+213 XX XX XX XX" class="student-reg-input">
                     </div>
 
-                    <div class="student-reg-field">
-                        <label class="student-reg-label">
-                            E-mail du parent <span class="student-reg-required">*</span>
-                        </label>
-                        <input type="email" name="parent_email" value="{{ old('parent_email') }}"
-                               placeholder="parent@email.com" class="student-reg-input" required>
-                    </div>
+                    
 
                     <div class="student-reg-field">
                         <label class="student-reg-label">Profession du parent</label>
