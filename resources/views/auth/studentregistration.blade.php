@@ -402,7 +402,7 @@
                         {{-- EMAIL DU PARENT --}}
                         <div class="student-reg-field">
                             <label class="student-reg-label">
-                                E-mail du parent
+                                E-mail
                                 <span class="student-reg-required">*</span>
                             </label>
 
@@ -410,7 +410,7 @@
                                 type="email"
                                 name="parent_email"
                                 value="{{ old('parent_email') }}"
-                                placeholder="parent@email.com"
+                                placeholder="email@domain.com"
                                 class="student-reg-input"
                                 required
                             >
