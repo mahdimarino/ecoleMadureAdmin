@@ -474,6 +474,11 @@ Route::group(['middleware' => 'auth'], function () {
                 'UserController@approveStudent'
             )
                 ->name('users.approveStudent');
+            Route::patch(
+                'approve-parent',
+                'UserController@approveParent'
+            )
+                ->name('users.approveParent');
         });
 
 
@@ -1163,3 +1168,21 @@ Route::group(
             ->name('my_children');
     }
 );
+
+/*
+|--------------------------------------------------------------------------
+| Parent Registration
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/parentregistration',
+    'SupportTeam\UserController@parentRegistration'
+)
+    ->name('parentregistration');
+
+Route::post(
+    '/parentregistration',
+    'SupportTeam\UserController@registerParent'
+)
+    ->name('parent.registration.store');

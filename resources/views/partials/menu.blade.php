@@ -391,7 +391,7 @@
 
                 {{-- End Exam --}}
 
-                @include('pages.' . Qs::getUserType() . '.menu')
+                {{-- @include('pages.' . Qs::getUserType() . '.menu') --}}
 
                 {{-- Manage Account --}}
                 <li class="nav-item">

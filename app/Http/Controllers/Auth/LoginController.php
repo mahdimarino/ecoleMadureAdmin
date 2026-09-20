@@ -35,11 +35,14 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        if ($user->user_type === 'teacher' && $user->is_approved != 1) {
+        if (
+            in_array($user->user_type, ['teacher', 'parent'])
+            && $user->is_approved != 1
+        ) {
             auth()->logout();
 
             return redirect()->back()->withErrors([
-                'identity' => 'Your teacher account is waiting for administrator approval.',
+                'identity' => 'Your account is waiting for administrator approval.',
             ]);
         }
     }

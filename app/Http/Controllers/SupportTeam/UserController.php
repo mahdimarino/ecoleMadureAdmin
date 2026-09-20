@@ -12,12 +12,13 @@ use App\Models\StudentRecord;
 use App\Repositories\LocationRepo;
 use App\Repositories\MyClassRepo;
 use App\Repositories\UserRepo;
-use Illuminate\Foundation\Auth\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Foundation\Auth\User;
 
 class UserController extends Controller
 {
@@ -49,35 +50,20 @@ class UserController extends Controller
 
         $d['blood_groups'] = $this->user->getBloodGroups();
 
-        /*
-        |--------------------------------------------------------------------------
-        | STUDENT APPLICATIONS
-        |--------------------------------------------------------------------------
-        |
-        | This was missing before.
-        | The Blade file uses:
-        |
-        | @foreach($student_applications as $app)
-        |
-        | so we must pass this variable to the view.
-        |
-        */
-
         $d['student_applications'] = StudentApplication::orderBy(
             'created_at',
             'desc'
         )->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | PENDING APPLICATION COUNT
-        |--------------------------------------------------------------------------
-        */
-
         $d['pending_applications'] = StudentApplication::where(
             'status',
             'pending'
         )->count();
+
+        // Students available to assign to parents
+        $d['parent_children'] = User::where('user_type', 'student')
+            ->orderBy('name')
+            ->get();
 
         return view(
             'pages.support_team.users.index',
@@ -427,27 +413,222 @@ class UserController extends Controller
     {
         $id = Qs::decodeHash($id);
 
-        // Redirect if Making Changes to Head of Super Admins
+        if (!$id) {
+            return back()->with('pop_error', 'Invalid user.');
+        }
+
+        // Prevent deleting Head Super Admin
         if (Qs::headSA($id)) {
             return back()->with('pop_error', __('msg.denied'));
         }
 
         $user = $this->user->find($id);
 
+        if (!$user) {
+            return back()->with('pop_error', 'User not found.');
+        }
+
+        // Prevent deleting teacher who teaches subjects
         if ($user->user_type == 'teacher' && $this->userTeachesSubject($user)) {
             return back()->with('pop_error', __('msg.del_teacher'));
         }
 
-        $path = Qs::getUploadPath($user->user_type) . $user->code;
-        Storage::exists($path) ? Storage::deleteDirectory($path) : true;
-        $this->user->delete($user->id);
+        DB::transaction(function () use ($user) {
 
-        return back()->with('flash_success', __('msg.del_ok'));
+            /*
+        |--------------------------------------------------------------------------
+        | DELETE STUDENT APPLICATION
+        |--------------------------------------------------------------------------
+        */
+
+            if ($user->user_type === 'student') {
+                StudentApplication::where('user_id', $user->id)->delete();
+
+                /*
+            |--------------------------------------------------------------------------
+            | DELETE STUDENT RECORD
+            |--------------------------------------------------------------------------
+            */
+
+                StudentRecord::where('user_id', $user->id)->delete();
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | DELETE USER PHOTO
+        |--------------------------------------------------------------------------
+        */
+
+            $path = Qs::getUploadPath($user->user_type) . $user->code;
+
+            if (Storage::exists($path)) {
+                Storage::deleteDirectory($path);
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | DELETE USER
+        |--------------------------------------------------------------------------
+        */
+
+            $this->user->delete($user->id);
+        });
+
+        return back()->with(
+            'flash_success',
+            __('msg.del_ok')
+        );
     }
 
     protected function userTeachesSubject($user)
     {
         $subjects = $this->my_class->findSubjectByTeacher($user->id);
         return ($subjects->count() > 0) ? true : false;
+    }
+
+    public function parentRegistration()
+    {
+        return view('auth.parentregistration');
+    }
+
+    public function registerParent(Request $req)
+    {
+        $data = $req->validate([
+
+            // Parent
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'phone' => 'required|string|max:30',
+            'phone2' => 'nullable|string|max:30',
+            'address' => 'required|string|max:255',
+
+            // Account
+            'password' => 'required|string|min:6|confirmed',
+
+            // Registration
+            'registration_date' => 'required|date',
+            'number_of_children' => 'required|integer|min:1',
+
+            // School
+            'previous_school' => 'required|string|max:255',
+            'studied_program' => 'required|string|max:100',
+            'requested_level' => 'nullable|string|max:100',
+
+            // Student
+            'student_name' => 'required|string|max:255',
+            'student_date_of_birth' => 'required|date',
+            'student_place_of_birth' => 'required|string|max:255',
+            'student_address' => 'required|string',
+            'student_status' => 'required|string|max:100',
+
+            // Academic
+            'dropped_subject' => 'nullable|string|max:255',
+            'terminal_specialties' => 'nullable|string|max:255',
+            'languages' => 'required|string|max:255',
+
+            // Educational needs
+            'educational_needs' => 'required|string',
+
+            // Activities
+            'extracurricular_activities' => 'nullable|string',
+            'interested_clubs' => 'nullable|string',
+
+            // Additional
+            'how_did_you_hear' => 'required|string|max:255',
+            'additional_information' => 'nullable|string',
+        ]);
+
+        // Force parent type server-side
+        $data['user_type'] = 'parent';
+
+        // Parent must be approved by admin
+        $data['is_approved'] = false;
+
+        // Generate username automatically
+        $data['username'] = 'parent_' . strtolower(Str::random(10));
+
+        // Generate user code
+        $data['code'] = strtoupper(Str::random(10));
+
+        // Default photo
+        $data['photo'] = Qs::getDefaultUserImage();
+
+        // No nationality/gender required by this form
+        $data['gender'] = null;
+        $data['nal_id'] = null;
+        $data['state_id'] = null;
+        $data['lga_id'] = null;
+
+        // Hash password
+        $data['password'] = Hash::make($req->password);
+
+        // Create parent
+        $this->user->create($data);
+
+        return redirect()
+            ->route('parentregistration')
+            ->with(
+                'success',
+                'Votre inscription a été envoyée. Votre compte sera activé après approbation par l’administration.'
+            );
+    }
+
+    public function approveParent(Request $request)
+    {
+        $request->validate([
+            'parent_id' => 'required|exists:users,id',
+            'children' => 'nullable|array',
+            'children.*' => 'exists:users,id',
+        ]);
+
+        $parent = User::findOrFail($request->parent_id);
+
+        if ($parent->user_type !== 'parent') {
+            abort(404);
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Approve Parent
+    |--------------------------------------------------------------------------
+    */
+
+        $parent->is_approved = 1;
+        $parent->save();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Attach Children To Parent
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->has('children')) {
+
+            foreach ($request->children as $childId) {
+
+                $student = User::where('id', $childId)
+                    ->where('user_type', 'student')
+                    ->first();
+
+                if ($student) {
+
+                    $studentRecord = StudentRecord::where(
+                        'user_id',
+                        $student->id
+                    )->first();
+
+                    if ($studentRecord) {
+
+                        $studentRecord->my_parent_id = $parent->id;
+                        $studentRecord->save();
+                    }
+                }
+            }
+        }
+
+        return back()->with(
+            'success',
+            'Parent approved successfully and children assigned.'
+        );
     }
 }

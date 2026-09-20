@@ -517,11 +517,11 @@
                                     <th>Phone</th>
                                     <th>Email</th>
 
-                                    @if (in_array($ut->title, ['teacher', 'student']))
-                                        <th>
-                                            Status
-                                        </th>
-                                    @endif
+                                   @if (in_array($ut->title, ['teacher', 'student', 'parent']))
+    <th>
+        Status
+    </th>
+@endif
 
                                     <th>
                                         Action
@@ -571,7 +571,7 @@
 
 
                                         {{-- STATUS --}}
-                                        @if (in_array($ut->title, ['teacher', 'student']))
+                                       @if (in_array($ut->title, ['teacher', 'student', 'parent']))
                                             <td>
 
                                                 @if ($u->is_approved)
@@ -631,59 +631,105 @@
                                                         {{-- TEACHER APPROVAL --}}
                                                         {{-- ================================================= --}}
 
-                                                        @if ($ut->title === 'teacher')
-                                                            @if ($u->is_approved)
-                                                                <span class="dropdown-item text-success">
+                                                       @if ($ut->title === 'teacher')
 
-                                                                    <i class="icon-check"></i>
+    {{-- ================================================= --}}
+    {{-- TEACHER APPROVAL --}}
+    {{-- ================================================= --}}
 
-                                                                    Approved
+    @if ($u->is_approved)
 
-                                                                </span>
-                                                            @else
-                                                                <form method="POST"
-                                                                    action="{{ route('users.approveTeacher', $u->id) }}">
+        <span class="dropdown-item text-success">
 
-                                                                    @csrf
+            <i class="icon-check"></i>
 
-                                                                    @method('PATCH')
+            Approved
 
-                                                                    <button type="submit"
-                                                                        class="dropdown-item text-success">
+        </span>
 
-                                                                        <i class="icon-check"></i>
+    @else
 
-                                                                        Approve Teacher
+        <form
+            method="POST"
+            action="{{ route('users.approveTeacher', $u->id) }}"
+        >
 
-                                                                    </button>
+            @csrf
 
-                                                                </form>
-                                                            @endif
+            @method('PATCH')
+
+            <button
+                type="submit"
+                class="dropdown-item text-success"
+            >
+
+                <i class="icon-check"></i>
+
+                Approve Teacher
+
+            </button>
+
+        </form>
+
+    @endif
 
 
-                                                            {{-- ================================================= --}}
-                                                            {{-- STUDENT APPROVAL --}}
-                                                            {{-- ================================================= --}}
-                                                        @elseif($ut->title === 'student')
-                                                            @if ($u->is_approved)
-                                                                <span class="dropdown-item text-success">
+@elseif($ut->title === 'student')
 
-                                                                    <i class="icon-check"></i>
+    {{-- ================================================= --}}
+    {{-- STUDENT APPROVAL --}}
+    {{-- ================================================= --}}
 
-                                                                    Approved
+    @if ($u->is_approved)
 
-                                                                </span>
-                                                            @else
-                                                                <button type="button"
-                                                                    class="dropdown-item text-success approve-student-btn"
-                                                                    data-user-id="{{ $u->id }}"
-                                                                    data-user-name="{{ $u->name }}">
-                                                                    <i class="icon-check"></i>
-                                                                    Approve Student
-                                                                </button>
-                                                            @endif
-                                                            
-                                                        @endif
+        <span class="dropdown-item text-success">
+
+            <i class="icon-check"></i>
+
+            Approved
+
+        </span>
+
+    @else
+
+        <button
+            type="button"
+            class="dropdown-item text-success approve-student-btn"
+            data-user-id="{{ $u->id }}"
+            data-user-name="{{ $u->name }}"
+        >
+
+            <i class="icon-check"></i>
+
+            Approve Student
+
+        </button>
+
+    @endif
+
+
+@elseif($ut->title === 'parent')
+
+    @if ($u->is_approved)
+
+        <span class="dropdown-item text-success">
+            <i class="icon-check"></i>
+            Approved
+        </span>
+
+    @else
+
+        <button type="button"
+            class="dropdown-item text-success approve-parent-btn"
+            data-user-id="{{ $u->id }}"
+            data-user-name="{{ $u->name }}">
+            <i class="icon-check"></i>
+            Approve Parent
+        </button>
+
+    @endif
+
+@endif
 
 
 
@@ -910,29 +956,24 @@
     View Application
 
 </button>
-@if (Qs::userIsSuperAdmin())
-    <a id="app-{{ $app->id }}"
-        onclick="confirmDelete(this.id)"
-        href="#"
-        class="dropdown-item text-danger">
+{{-- @if (Qs::userIsSuperAdmin())
 
-        <i class="icon-trash"></i>
-
-        Delete Application
-
-    </a>
-
-
-    <form method="post"
-        id="item-delete-app-{{ $app->id }}"
+    <form
+        method="POST"
         action="{{ route('student-applications.destroy', $app->id) }}"
-        class="hidden">
-
+        style="display: block;"
+        onsubmit="return confirm('Are you sure you want to delete this student?');"
+    >
         @csrf
-        @method('delete')
+        @method('DELETE')
 
+        <button type="submit" class="dropdown-item text-danger">
+            <i class="icon-trash"></i>
+            Delete Student
+        </button>
     </form>
-@endif
+
+@endif --}}
 
 
                                                     {{-- EDIT --}}
@@ -1609,6 +1650,198 @@
 
     </div>
 
+    {{-- ========================================================= --}}
+{{-- APPROVE PARENT MODAL --}}
+{{-- ========================================================= --}}
+
+<div id="approve-parent-modal"
+     class="modal fade"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Approve Parent
+                </h5>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form method="POST"
+                  action="{{ route('users.approveParent') }}"
+                  id="approve-parent-form">
+
+                @csrf
+                @method('PATCH')
+
+                <input type="hidden"
+                       name="parent_id"
+                       id="approve-parent-id">
+
+                <div class="modal-body">
+
+                    <div class="alert alert-info">
+                        <strong>Parent:</strong>
+                        <span id="approve-parent-name"></span>
+                    </div>
+
+                    <h6 class="font-weight-semibold mb-3">
+                        Select the children for this parent
+                    </h6>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-hover">
+
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">
+                                        <input type="checkbox"
+                                               id="select-all-parent-children">
+                                    </th>
+
+                                    <th>
+                                        Student Name
+                                    </th>
+
+                                    <th>
+                                        Email
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach($parent_children as $child)
+
+                                    <tr>
+
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="children[]"
+                                                   value="{{ $child->id }}"
+                                                   class="parent-child-checkbox">
+                                        </td>
+
+                                        <td>
+                                            {{ $child->name }}
+                                        </td>
+
+                                        <td>
+                                            {{ $child->email ?? '-' }}
+                                        </td>
+
+                                        <td>
+
+                                            @if($child->is_approved)
+                                                <span class="badge badge-success">
+                                                    Approved
+                                                </span>
+                                            @else
+                                                <span class="badge badge-warning">
+                                                    Pending
+                                                </span>
+                                            @endif
+
+                                        </td>
+
+                                    </tr>
+
+                                @endforeach
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    @if($parent_children->count() === 0)
+
+                        <div class="alert alert-warning">
+                            No students are available to assign to this parent.
+                        </div>
+
+                    @endif
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-light"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        <i class="icon-check"></i>
+                        Approve Parent
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+$(document).on('click', '.approve-parent-btn', function () {
+
+    var parentId = $(this).data('user-id');
+    var parentName = $(this).data('user-name');
+
+    $('#approve-parent-id').val(parentId);
+    $('#approve-parent-name').text(parentName);
+
+    $('.parent-child-checkbox').prop('checked', false);
+    $('#select-all-parent-children').prop('checked', false);
+
+    $('#approve-parent-modal').modal('show');
+});
+
+
+$('#select-all-parent-children').on('change', function () {
+
+    $('.parent-child-checkbox').prop(
+        'checked',
+        $(this).is(':checked')
+    );
+
+});
+
+
+$(document).on('change', '.parent-child-checkbox', function () {
+
+    var total = $('.parent-child-checkbox').length;
+    var checked = $('.parent-child-checkbox:checked').length;
+
+    $('#select-all-parent-children').prop(
+        'checked',
+        total > 0 && total === checked
+    );
+
+});
+</script>
+
 
     {{-- ========================================================= --}}
     {{-- JAVASCRIPT --}}
@@ -2008,6 +2241,27 @@
             }
         );
     </script>
+    <script>
+    function deleteStudentApplication(applicationId) {
+
+        if (!confirm('Are you sure you want to delete this student application?')) {
+            return;
+        }
+
+        var form = document.getElementById(
+            'delete-student-application-' + applicationId
+        );
+
+        if (form) {
+            form.submit();
+        } else {
+            console.error(
+                'Delete form not found for application:',
+                applicationId
+            );
+        }
+    }
+</script>
 
 
 @endsection

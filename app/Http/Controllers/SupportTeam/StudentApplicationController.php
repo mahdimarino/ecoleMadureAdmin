@@ -449,16 +449,16 @@ class StudentApplicationController extends Controller
     {
         $application = StudentApplication::findOrFail($id);
 
-        // Delete photo if one exists
         if ($application->photo) {
             Storage::disk('public')->delete($application->photo);
         }
 
         $application->delete();
 
-        return redirect()
-            ->route('student-applications.index')
-            ->with('success', 'Application deleted successfully.');
+        return back()->with(
+            'success',
+            'Application deleted successfully.'
+        );
     }
     public function approve($id)
     {

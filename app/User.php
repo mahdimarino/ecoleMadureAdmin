@@ -23,7 +23,44 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'username', 'email', 'phone', 'phone2', 'dob', 'gender', 'photo', 'address', 'bg_id', 'password', 'nal_id', 'state_id', 'lga_id', 'code', 'user_type', 'email_verified_at'
+        'name',
+        'username',
+        'email',
+        'phone',
+        'phone2',
+        'dob',
+        'gender',
+        'photo',
+        'address',
+        'bg_id',
+        'password',
+        'nal_id',
+        'state_id',
+        'lga_id',
+        'code',
+        'user_type',
+        'email_verified_at',
+        'is_approved',
+
+        // Parent registration
+        'registration_date',
+        'number_of_children',
+        'previous_school',
+        'studied_program',
+        'requested_level',
+        'student_name',
+        'student_date_of_birth',
+        'student_place_of_birth',
+        'student_address',
+        'student_status',
+        'dropped_subject',
+        'terminal_specialties',
+        'languages',
+        'educational_needs',
+        'extracurricular_activities',
+        'interested_clubs',
+        'how_did_you_hear',
+        'additional_information',
     ];
 
     /**
