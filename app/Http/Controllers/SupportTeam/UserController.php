@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\User;
 
@@ -491,9 +492,26 @@ class UserController extends Controller
         return view('auth.parentregistration');
     }
 
+    // Levels for which "Informations académiques" is shown/required
+    protected $academicLevels = ['Premiere-generale', 'Terminale-generale'];
+
     public function registerParent(Request $req)
     {
-        $data = $req->validate([
+        /*
+    |--------------------------------------------------------------------------
+    | Get children from request
+    |--------------------------------------------------------------------------
+    */
+
+        $children = $req->input('children', []);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
+
+        $rules = [
 
             // Parent
             'name' => 'required|string|max:255',
@@ -502,68 +520,266 @@ class UserController extends Controller
             'phone2' => 'nullable|string|max:30',
             'address' => 'required|string|max:255',
 
-            // Account
-            'password' => 'required|string|min:6|confirmed',
+            // Password
+            'password' => [
+                'required',
+                'string',
+                'min:1',
+                'confirmed',
+            ],
 
             // Registration
             'registration_date' => 'required|date',
             'number_of_children' => 'required|integer|min:1',
 
-            // School
-            'previous_school' => 'required|string|max:255',
-            'studied_program' => 'required|string|max:100',
-            'requested_level' => 'nullable|string|max:100',
-
-            // Student
-            'student_name' => 'required|string|max:255',
-            'student_date_of_birth' => 'required|date',
-            'student_place_of_birth' => 'required|string|max:255',
-            'student_address' => 'required|string',
-            'student_status' => 'required|string|max:100',
-
-            // Academic
-            'dropped_subject' => 'nullable|string|max:255',
-            'terminal_specialties' => 'nullable|string|max:255',
-            'languages' => 'required|string|max:255',
-
-            // Educational needs
-            'educational_needs' => 'required|string',
-
-            // Activities
-            'extracurricular_activities' => 'nullable|string',
-            'interested_clubs' => 'nullable|string',
+            // Children
+            'children' => 'required|array|min:1',
 
             // Additional
             'how_did_you_hear' => 'required|string|max:255',
             'additional_information' => 'nullable|string',
-        ]);
+        ];
 
-        // Force parent type server-side
-        $data['user_type'] = 'parent';
+        /*
+    |--------------------------------------------------------------------------
+    | Validate every child
+    |--------------------------------------------------------------------------
+    */
 
-        // Parent must be approved by admin
-        $data['is_approved'] = false;
+        foreach ($children as $i => $child) {
 
-        // Generate username automatically
-        $data['username'] = 'parent_' . strtolower(Str::random(10));
+            $rules["children.$i.previous_school"] =
+                'required|string|max:255';
 
-        // Generate user code
-        $data['code'] = strtoupper(Str::random(10));
+            $rules["children.$i.studied_program"] =
+                'required|string|max:100';
 
-        // Default photo
-        $data['photo'] = Qs::getDefaultUserImage();
+            $rules["children.$i.requested_level"] =
+                'required|string|max:100';
 
-        // No nationality/gender required by this form
-        $data['gender'] = null;
-        $data['nal_id'] = null;
-        $data['state_id'] = null;
-        $data['lga_id'] = null;
+            $rules["children.$i.student_name"] =
+                'required|string|max:255';
 
-        // Hash password
-        $data['password'] = Hash::make($req->password);
+            $rules["children.$i.student_date_of_birth"] =
+                'required|date';
 
-        // Create parent
-        $this->user->create($data);
+            $rules["children.$i.student_place_of_birth"] =
+                'required|string|max:255';
+
+            $rules["children.$i.student_address"] =
+                'required|string';
+
+            $rules["children.$i.student_status"] =
+                'required|string|max:100';
+
+            $rules["children.$i.educational_needs"] =
+                'required|string';
+
+            $rules["children.$i.extracurricular_activities"] =
+                'nullable|string';
+
+            $rules["children.$i.interested_clubs"] =
+                'nullable|string';
+
+            /*
+        |--------------------------------------------------------------------------
+        | Academic fields
+        |--------------------------------------------------------------------------
+        */
+
+            $level = $child['requested_level'] ?? null;
+
+            if (in_array($level, $this->academicLevels, true)) {
+
+                $rules["children.$i.dropped_subject"] =
+                    'required|string|max:255';
+
+                $rules["children.$i.terminal_specialties"] =
+                    'required|array|size:2';
+
+                $rules["children.$i.terminal_specialties.*"] =
+                    'string|max:255';
+
+                $rules["children.$i.languages"] =
+                    'required|array|size:2';
+
+                $rules["children.$i.languages.*"] =
+                    'string|max:255';
+            } else {
+
+                $rules["children.$i.dropped_subject"] =
+                    'nullable|string|max:255';
+
+                $rules["children.$i.terminal_specialties"] =
+                    'nullable|array';
+
+                $rules["children.$i.languages"] =
+                    'nullable|array';
+            }
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Error messages
+    |--------------------------------------------------------------------------
+    */
+
+        $messages = [
+
+            'address.required' =>
+            'Veuillez renseigner votre adresse.',
+
+            'password.required' =>
+            'Veuillez renseigner un mot de passe.',
+
+            'password.confirmed' =>
+            'Les mots de passe ne correspondent pas.',
+
+            'children.required' =>
+            'Veuillez renseigner au moins un enfant.',
+
+            'children.*.terminal_specialties.size' =>
+            'Veuillez sélectionner exactement deux spécialités.',
+
+            'children.*.languages.size' =>
+            'Veuillez sélectionner exactement deux langues.',
+
+            'children.*.dropped_subject.required' =>
+            'Veuillez sélectionner la matière abandonnée en Première.',
+        ];
+
+        /*
+    |--------------------------------------------------------------------------
+    | Validate
+    |--------------------------------------------------------------------------
+    */
+
+        $validator = Validator::make(
+            $req->all(),
+            $rules,
+            $messages
+        );
+
+        $data = $validator->validate();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Clean child data
+    |--------------------------------------------------------------------------
+    */
+
+        foreach ($data['children'] as $i => $child) {
+
+            $isAcademic = in_array(
+                $child['requested_level'],
+                $this->academicLevels,
+                true
+            );
+
+            if (!$isAcademic) {
+
+                $data['children'][$i]['dropped_subject'] = null;
+
+                $data['children'][$i]['terminal_specialties'] = [];
+
+                $data['children'][$i]['languages'] = [];
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Make sure optional fields always exist
+        |--------------------------------------------------------------------------
+        */
+
+            $data['children'][$i]['extracurricular_activities']
+                = $child['extracurricular_activities'] ?? null;
+
+            $data['children'][$i]['interested_clubs']
+                = $child['interested_clubs'] ?? null;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Prepare parent data
+    |--------------------------------------------------------------------------
+    */
+
+        $parentData = [
+
+            'name' => $data['name'],
+
+            'email' => $data['email'],
+
+            'phone' => $data['phone'],
+
+            'phone2' => $data['phone2'] ?? null,
+
+            'address' => $data['address'],
+
+            'registration_date' => $data['registration_date'],
+
+            'number_of_children' =>
+            (int) $data['number_of_children'],
+
+            /*
+        |--------------------------------------------------------------------------
+        | THIS IS THE IMPORTANT PART
+        |--------------------------------------------------------------------------
+        | All children are stored in the users.children JSON column.
+        */
+
+            'children' => $data['children'],
+
+            'how_did_you_hear' =>
+            $data['how_did_you_hear'],
+
+            'additional_information' =>
+            $data['additional_information'] ?? null,
+
+            /*
+        |--------------------------------------------------------------------------
+        | Account
+        |--------------------------------------------------------------------------
+        */
+
+            'user_type' => 'parent',
+
+            'is_approved' => false,
+
+            'username' =>
+            'parent_' . strtolower(Str::random(10)),
+
+            'code' =>
+            strtoupper(Str::random(10)),
+
+            'photo' =>
+            Qs::getDefaultUserImage(),
+
+            'gender' => null,
+
+            'nal_id' => null,
+
+            'state_id' => null,
+
+            'lga_id' => null,
+
+            'password' =>
+            Hash::make($data['password']),
+        ];
+
+        /*
+    |--------------------------------------------------------------------------
+    | Create parent
+    |--------------------------------------------------------------------------
+    */
+
+        $parent = $this->user->create($parentData);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Redirect
+    |--------------------------------------------------------------------------
+    */
 
         return redirect()
             ->route('parentregistration')

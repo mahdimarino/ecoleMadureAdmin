@@ -61,6 +61,7 @@ class User extends Authenticatable
         'interested_clubs',
         'how_did_you_hear',
         'additional_information',
+        'children',
     ];
 
     /**
@@ -69,7 +70,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'children' => 'array',
     ];
     public function studentRecord()
     {

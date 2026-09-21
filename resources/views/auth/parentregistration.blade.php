@@ -1,528 +1,1183 @@
-@extends('layouts.login_master')
 
-@section('content')
+<!DOCTYPE html>
+<html lang="fr">
 
-<style>
-    /* =========================================
-       INSCRIPTION PARENT
-       ========================================= */
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .parent-reg-page {
-        width: 100%;
-        min-height: 100vh;
-        padding: 40px 20px;
-        background: #f4f6f9;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-    }
+    <title>Inscription Parent</title>
 
-    .parent-reg-wrapper {
-        width: 100%;
-        max-width: 1000px;
-    }
-
-    .parent-reg-box {
-        width: 100%;
-        background: #ffffff !important;
-        border: 1px solid #dddddd;
-        border-radius: 10px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        overflow: hidden;
-    }
-
-    .parent-reg-header {
-        padding: 25px 30px;
-        text-align: center;
-    }
-
-    .parent-reg-logo {
-        max-width: 180px;
-        max-height: 80px;
-        margin: 0 auto 15px;
-        display: block;
-    }
-
-    .parent-reg-header-title {
-        margin: 0;
-        color: #000000 !important;
-        font-size: 26px;
-        font-weight: 600;
-    }
-
-    .parent-reg-header-text {
-        margin: 7px 0 0;
-        color: #010101 !important;
-        font-size: 14px;
-    }
-
-    .parent-reg-body {
-        background: #ffffff !important;
-        padding: 35px;
-    }
-
-    .parent-reg-section-title {
-        margin: 35px 0 25px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #eeeeee;
-        color: #333333 !important;
-        font-size: 20px;
-        font-weight: 600;
-    }
-
-    .parent-reg-section-title:first-of-type {
-        margin-top: 0;
-    }
-
-    .parent-reg-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px 25px;
-    }
-
-    .parent-reg-field {
-        width: 100%;
-    }
-
-    .parent-reg-field-full {
-        grid-column: 1 / -1;
-    }
-
-    .parent-reg-label {
-        display: block;
-        margin-bottom: 7px;
-        color: #333333 !important;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .parent-reg-required {
-        color: #e53935 !important;
-    }
-
-    .parent-reg-input,
-    .parent-reg-select,
-    .parent-reg-textarea {
-        display: block;
-        width: 100%;
-        padding: 10px 13px;
-        background: #ffffff !important;
-        color: #333333 !important;
-        border: 1px solid #bdbdbd !important;
-        border-radius: 5px;
-        outline: none !important;
-        font-size: 14px;
-        box-sizing: border-box;
-        font-family: inherit;
-    }
-
-    .parent-reg-input,
-    .parent-reg-select {
-        height: 44px;
-    }
-
-    .parent-reg-textarea {
-        min-height: 90px;
-        resize: vertical;
-    }
-
-    .parent-reg-input::placeholder,
-    .parent-reg-textarea::placeholder {
-        color: #999999 !important;
-        opacity: 1 !important;
-    }
-
-    .parent-reg-input:focus,
-    .parent-reg-select:focus,
-    .parent-reg-textarea:focus {
-        background: #ffffff !important;
-        color: #333333 !important;
-        border-color: #2196f3 !important;
-        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12) !important;
-    }
-
-    .parent-reg-select option {
-        background: #ffffff !important;
-        color: #333333 !important;
-    }
-
-    .parent-reg-help {
-        display: block;
-        margin-top: 6px;
-        color: #777777 !important;
-        font-size: 12px;
-    }
-
-    .parent-reg-alert-danger {
-        margin-bottom: 25px;
-        padding: 15px 18px;
-        background: #f8d7da !important;
-        color: #721c24 !important;
-        border: 1px solid #f5c6cb;
-        border-radius: 5px;
-    }
-
-    .parent-reg-alert-danger ul {
-        margin: 0;
-        padding-left: 20px;
-    }
-
-    .parent-reg-alert-danger li {
-        color: #721c24 !important;
-    }
-
-    .parent-reg-alert-success {
-        margin-bottom: 25px;
-        padding: 15px 18px;
-        text-align: center;
-        background: #d4edda !important;
-        color: #155724 !important;
-        border: 1px solid #c3e6cb;
-        border-radius: 5px;
-    }
-
-    .parent-reg-submit-area {
-        margin-top: 30px;
-        padding-top: 25px;
-        border-top: 1px solid #eeeeee;
-        text-align: center;
-    }
-
-    .parent-reg-submit {
-        display: inline-block;
-        min-width: 240px;
-        padding: 12px 30px;
-        background: #2196f3 !important;
-        color: #ffffff !important;
-        border: 1px solid #2196f3 !important;
-        border-radius: 5px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .parent-reg-submit:hover {
-        background: #1976d2 !important;
-        border-color: #1976d2 !important;
-        color: #ffffff !important;
-    }
-
-    @media (max-width: 767px) {
-
-        .parent-reg-page {
-            padding: 20px 10px;
+    <style>
+        * {
+            box-sizing: border-box;
         }
 
-        .parent-reg-body {
-            padding: 25px 20px;
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #222;
+        }
+
+        .parent-reg-wrapper {
+            width: 100%;
+            padding: 40px 15px;
+        }
+
+        .parent-reg-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+            padding: 35px;
+        }
+
+        .parent-reg-title {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 30px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .parent-reg-subtitle {
+            text-align: center;
+            margin-bottom: 35px;
+            color: #6b7280;
+        }
+
+        .parent-reg-section {
+            margin-top: 35px;
+            margin-bottom: 30px;
+        }
+
+        .parent-reg-section-title {
+            font-size: 21px;
+            font-weight: 700;
+            color: #1f2937;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
         }
 
         .parent-reg-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
         }
 
-        .parent-reg-header-title {
-            font-size: 22px;
+        .parent-reg-field {
+            width: 100%;
+        }
+
+        .parent-reg-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .parent-reg-label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .required-star {
+            color: #dc2626;
+        }
+
+        .parent-reg-input,
+        .parent-reg-select,
+        .parent-reg-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .parent-reg-input:focus,
+        .parent-reg-select:focus,
+        .parent-reg-textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        .parent-reg-textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .children-count-wrapper {
+            max-width: 350px;
+        }
+
+        .child-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            background: #fafafa;
+        }
+
+        .child-card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 25px;
+        }
+
+        .child-card + .child-card {
+            margin-top: 20px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 7px;
+            background: #fff;
+        }
+
+        .checkbox-item input {
+            width: 17px;
+            height: 17px;
+        }
+
+        .child-error {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 15px 18px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .success-box {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 15px 18px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .error-input {
+            border-color: #dc2626 !important;
+        }
+
+        .parent-reg-submit-wrapper {
+            text-align: center;
+            margin-top: 35px;
         }
 
         .parent-reg-submit {
-            width: 100%;
+            border: 0;
+            background: #2563eb;
+            color: white;
+            padding: 14px 35px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-    }
-</style>
 
-<div style="background-image: url(/global_assets/images/login_covereco.png)" class="parent-reg-page">
+        .parent-reg-submit:hover {
+            background: #1d4ed8;
+        }
 
-    <div class="parent-reg-wrapper">
+        .parent-reg-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
 
-        <div class="parent-reg-box">
+        .help-text {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 6px;
+        }
 
-            {{-- EN-TÊTE --}}
-            <div class="parent-reg-header">
+        .academic-fields {
+            display: none;
+        }
 
-                <img
+        @media (max-width: 768px) {
+            .parent-reg-container {
+                padding: 22px;
+            }
+
+            .parent-reg-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .parent-reg-field.full {
+                grid-column: auto;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .parent-reg-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div style="background-image: url(/global_assets/images/login_covereco.png)" class="parent-reg-wrapper">
+    
+    <div class="parent-reg-container">
+        <div class="text-center" >
+  <img width="200" 
                     src="https://madaure.vercel.app/assets/images/logo/logo.png"
                     alt="Logo"
-                    class="parent-reg-logo"
-                    onerror="this.style.display='none';"
+                    class="student-reg-logo margin-auto parent-reg-title"
+                   
                 >
+        </div>
 
-                <h3 class="parent-reg-header-title">
-                    Inscription Parent
-                </h3>
 
-                <p class="parent-reg-header-text">
-                    Créez votre dossier d'inscription — votre dossier sera examiné par l'administration.
-                </p>
+        <h1 class="parent-reg-title">
+            Inscription Parent
+        </h1>
+
+        <p class="parent-reg-subtitle">
+            Veuillez remplir les informations ci-dessous.
+        </p>
+
+        {{-- SUCCESS --}}
+        @if(session('success'))
+            <div class="success-box">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        {{-- GENERAL ERRORS --}}
+        @if($errors->any())
+            <div class="error-box">
+                <strong>Veuillez corriger les erreurs suivantes :</strong>
+
+                <ul style="margin-bottom:0; margin-top:10px;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form
+            method="POST"
+            action="{{ route('parent.registration.store') }}"
+            class="parent-reg-form"
+            id="parent-reg-form"
+            novalidate
+        >
+
+            @csrf
+
+            {{-- ========================================================= --}}
+            {{-- PARENT INFORMATION --}}
+            {{-- ========================================================= --}}
+
+            <div class="parent-reg-section">
+
+                <div class="parent-reg-section-title">
+                    Informations du parent
+                </div>
+
+                <div class="parent-reg-grid">
+
+                    {{-- NAME --}}
+                    <div class="parent-reg-field">
+
+                        <label class="parent-reg-label">
+                            Nom et prénom
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            class="parent-reg-input @error('name') error-input @enderror"
+                            value="{{ old('name') }}"
+                            required
+                        >
+
+                        @error('name')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
+
+                    </div>
+
+                    {{-- EMAIL --}}
+                    <div class="parent-reg-field">
+
+                        <label class="parent-reg-label">
+                            Email
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            class="parent-reg-input @error('email') error-input @enderror"
+                            value="{{ old('email') }}"
+                            required
+                        >
+
+                        @error('email')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
+
+                    </div>
+
+                    {{-- PHONE --}}
+                    <div class="parent-reg-field">
+
+                        <label class="parent-reg-label">
+                            Téléphone
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            name="phone"
+                            class="parent-reg-input @error('phone') error-input @enderror"
+                            value="{{ old('phone') }}"
+                            required
+                        >
+
+                        @error('phone')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
+
+                    </div>
+
+                    {{-- PHONE 2 --}}
+                    <div class="parent-reg-field">
+
+                        <label class="parent-reg-label">
+                            Deuxième téléphone
+                        </label>
+
+                        <input
+                            type="text"
+                            name="phone2"
+                            class="parent-reg-input"
+                            value="{{ old('phone2') }}"
+                        >
+
+                    </div>
+
+                    {{-- REGISTRATION DATE --}}
+                    <div class="parent-reg-field">
+
+                        <label class="parent-reg-label">
+                            Date d'inscription
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            name="registration_date"
+                            class="parent-reg-input @error('registration_date') error-input @enderror"
+                            value="{{ old('registration_date', date('Y-m-d')) }}"
+                            required
+                        >
+
+                        @error('registration_date')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
+
+                    </div>
+
+                    {{-- NUMBER OF CHILDREN --}}
+                    <div class="parent-reg-field children-count-wrapper">
+
+                        <label class="parent-reg-label">
+                            Nombre d'enfants
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <select
+                            id="children-count-select"
+                            class="parent-reg-select"
+                            required
+                        >
+                            <option value="">Sélectionnez...</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+
+                        <input
+                            type="number"
+                            id="children-count-custom"
+                            class="parent-reg-input"
+                            placeholder="Indiquez le nombre d'enfants"
+                            min="1"
+                            style="display:none; margin-top:10px;"
+                        >
+
+                        {{-- IMPORTANT --}}
+                        <input
+                            type="hidden"
+                            name="number_of_children"
+                            id="number_of_children_hidden"
+                            value="{{ old('number_of_children') }}"
+                        >
+
+                        <div class="help-text">
+                            Sélectionnez le nombre d'enfants à inscrire.
+                        </div>
+
+                    </div>
+
+                    {{-- ADDRESS --}}
+                    <div class="parent-reg-field full">
+
+                        <label class="parent-reg-label">
+                            Adresse
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <textarea
+                            name="address"
+                            class="parent-reg-textarea @error('address') error-input @enderror"
+                            required
+                        >{{ old('address') }}</textarea>
+
+                        @error('address')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            {{-- CORPS --}}
-            <div class="parent-reg-body">
+            {{-- ========================================================= --}}
+            {{-- CHILDREN --}}
+            {{-- ========================================================= --}}
+
+            <div class="parent-reg-section">
+
+                <div class="parent-reg-section-title">
+                    Informations des enfants
+                </div>
+
+                <div id="children-container"></div>
+
+            </div>
 
 
-                {{-- ERREURS --}}
-                @if ($errors->any())
+            {{-- ========================================================= --}}
+            {{-- OTHER PARENT INFORMATION --}}
+            {{-- ========================================================= --}}
 
-                    <div class="parent-reg-alert-danger">
+            <div class="parent-reg-section">
 
-                        <ul>
+                <div class="parent-reg-section-title">
+                    Informations supplémentaires
+                </div>
 
-                            @foreach ($errors->all() as $error)
+                <div class="parent-reg-grid">
 
-                                <li>
-                                    {{ $error }}
-                                </li>
+                    {{-- HOW DID YOU HEAR --}}
+                    <div class="parent-reg-field full">
 
-                            @endforeach
+                        <label class="parent-reg-label">
+                            Comment avez-vous connu notre établissement ?
+                            <span class="required-star">*</span>
+                        </label>
 
-                        </ul>
+                        <select
+                            name="how_did_you_hear"
+                            class="parent-reg-select @error('how_did_you_hear') error-input @enderror"
+                            required
+                        >
+
+                            <option value="">
+                                Sélectionnez...
+                            </option>
+
+                            <option
+                                value="Facebook"
+                                {{ old('how_did_you_hear') == 'Facebook' ? 'selected' : '' }}
+                            >
+                                Facebook
+                            </option>
+
+                            <option
+                                value="Instagram"
+                                {{ old('how_did_you_hear') == 'Instagram' ? 'selected' : '' }}
+                            >
+                                Instagram
+                            </option>
+
+                            <option
+                                value="TikTok"
+                                {{ old('how_did_you_hear') == 'TikTok' ? 'selected' : '' }}
+                            >
+                                TikTok
+                            </option>
+
+                            <option
+                                value="Google"
+                                {{ old('how_did_you_hear') == 'Google' ? 'selected' : '' }}
+                            >
+                                Google
+                            </option>
+
+                            <option
+                                value="Ami ou famille"
+                                {{ old('how_did_you_hear') == 'Ami ou famille' ? 'selected' : '' }}
+                            >
+                                Ami ou famille
+                            </option>
+
+                            <option
+                                value="Autre"
+                                {{ old('how_did_you_hear') == 'Autre' ? 'selected' : '' }}
+                            >
+                                Autre
+                            </option>
+
+                        </select>
+
+                        @error('how_did_you_hear')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
 
                     </div>
 
-                @endif
+                    {{-- ADDITIONAL INFORMATION --}}
+                    <div class="parent-reg-field full">
 
+                        <label class="parent-reg-label">
+                            Informations supplémentaires
+                        </label>
 
-                {{-- SUCCÈS --}}
-                @if(session('success'))
+                        <textarea
+                            name="additional_information"
+                            class="parent-reg-textarea @error('additional_information') error-input @enderror"
+                            placeholder="Informations supplémentaires..."
+                        >{{ old('additional_information') }}</textarea>
 
-                    <div class="parent-reg-alert-success">
-                        {{ session('success') }}
+                        @error('additional_information')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
+
                     </div>
 
-                @endif
+                </div>
+
+            </div>
 
 
-                <form
-                    method="POST"
-                    action="{{ route('parent.registration.store') }}"
-                    class="parent-reg-form"
+            {{-- ========================================================= --}}
+            {{-- PASSWORD --}}
+            {{-- ========================================================= --}}
+
+            <div class="parent-reg-section">
+
+                <div class="parent-reg-section-title">
+                    Sécurité du compte
+                </div>
+
+                <div class="parent-reg-grid">
+
+                    {{-- PASSWORD --}}
+                    <div class="parent-reg-field">
+
+                        <label class="parent-reg-label">
+                            Mot de passe
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="parent-reg-input @error('password') error-input @enderror"
+                            required
+                        >
+
+                        @error('password')
+                            <div class="child-error">{{ $message }}</div>
+                        @enderror
+
+                    </div>
+
+                    {{-- CONFIRM PASSWORD --}}
+                    <div class="parent-reg-field">
+
+                        <label class="parent-reg-label">
+                            Confirmer le mot de passe
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            id="password_confirmation"
+                            class="parent-reg-input"
+                            required
+                        >
+
+                        <div
+                            id="password-match-message"
+                            class="help-text"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- ========================================================= --}}
+            {{-- SUBMIT --}}
+            {{-- ========================================================= --}}
+
+            <div class="parent-reg-submit-wrapper">
+
+                <button
+                    type="submit"
+                    class="parent-reg-submit"
+                    id="parent-reg-submit"
+                >
+                    Envoyer mon inscription
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+    |--------------------------------------------------------------------------
+    | OLD DATA
+    |--------------------------------------------------------------------------
+    */
+
+    const OLD_CHILDREN = @json(old('children', []));
+    const OLD_NUMBER_OF_CHILDREN = @json(old('number_of_children'));
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACADEMIC LEVELS
+    |--------------------------------------------------------------------------
+    */
+
+    const ACADEMIC_LEVELS = [
+        'Premiere-generale',
+        'Terminale-generale'
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AVAILABLE OPTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    const SPECIALTIES = [
+        'Mathématiques',
+        'Physique',
+        'Sciences naturelles',
+        'Économie',
+        'Gestion',
+        'Littérature',
+        'Langues étrangères'
+    ];
+
+    const LANGUAGES = [
+        'Français',
+        'Anglais',
+        'Espagnol',
+        'Allemand',
+        'Italien'
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ELEMENTS
+    |--------------------------------------------------------------------------
+    */
+
+    const childrenSelect =
+        document.getElementById('children-count-select');
+
+    const childrenCustom =
+        document.getElementById('children-count-custom');
+
+    const childrenHidden =
+        document.getElementById('number_of_children_hidden');
+
+    const childrenContainer =
+        document.getElementById('children-container');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CURRENT CHILD DATA
+    |--------------------------------------------------------------------------
+    */
+
+    function currentChildrenData() {
+
+        const cards =
+            childrenContainer.querySelectorAll('.child-card');
+
+        const result = [];
+
+        cards.forEach((card, index) => {
+
+            const child = {};
+
+            card.querySelectorAll('input, select, textarea')
+                .forEach(input => {
+
+                    if (!input.name) {
+                        return;
+                    }
+
+                    const match =
+                        input.name.match(
+                            /children\[(\d+)\]\[([^\]]+)\](?:\[\])?/
+                        );
+
+                    if (!match) {
+                        return;
+                    }
+
+                    const field = match[2];
+
+                    if (input.type === 'checkbox') {
+
+                        if (!child[field]) {
+                            child[field] = [];
+                        }
+
+                        if (input.checked) {
+                            child[field].push(input.value);
+                        }
+
+                    } else {
+
+                        child[field] = input.value;
+
+                    }
+
+                });
+
+            result.push(child);
+
+        });
+
+        return result;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESCAPE HTML
+    |--------------------------------------------------------------------------
+    */
+
+    function escapeHtml(value) {
+
+        if (value === null || value === undefined) {
+            return '';
+        }
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE CHECKBOXES
+    |--------------------------------------------------------------------------
+    */
+
+    function createCheckboxes(
+        name,
+        values,
+        selectedValues = []
+    ) {
+
+        if (!Array.isArray(selectedValues)) {
+            selectedValues = [];
+        }
+
+        return values.map(value => {
+
+            const checked =
+                selectedValues.includes(value)
+                    ? 'checked'
+                    : '';
+
+            return `
+                <label class="checkbox-item">
+
+                    <input
+                        type="checkbox"
+                        name="${name}[]"
+                        value="${escapeHtml(value)}"
+                        ${checked}
+                    >
+
+                    <span>
+                        ${escapeHtml(value)}
+                    </span>
+
+                </label>
+            `;
+
+        }).join('');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RENDER CHILDREN
+    |--------------------------------------------------------------------------
+    */
+
+    function renderChildren(count, existingData = []) {
+
+        count = parseInt(count);
+
+        if (isNaN(count) || count < 1) {
+
+            childrenContainer.innerHTML = '';
+
+            return;
+        }
+
+        let html = '';
+
+        for (let i = 0; i < count; i++) {
+
+            const child =
+                existingData[i] || {};
+
+            const specialties =
+                Array.isArray(child.terminal_specialties)
+                    ? child.terminal_specialties
+                    : [];
+
+            const languages =
+                Array.isArray(child.languages)
+                    ? child.languages
+                    : [];
+
+            const requestedLevel =
+                child.requested_level || '';
+
+            const isAcademic =
+                ACADEMIC_LEVELS.includes(requestedLevel);
+
+            html += `
+
+                <div
+                    class="child-card"
+                    data-child-index="${i}"
                 >
 
-                    @csrf
+                    <div class="child-card-title">
+                        Enfant ${i + 1}
+                    </div>
 
-
-                    {{-- ==================================================
-                         INFORMATIONS DU PARENT
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Informations du parent
-                    </h4>
 
                     <div class="parent-reg-grid">
 
-                        {{-- NOM ET PRÉNOM --}}
-                        <div class="parent-reg-field parent-reg-field-full">
+
+                        {{-- PREVIOUS SCHOOL --}}
+                        <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
-                                Nom et prénom <span class="parent-reg-required">*</span>
+                                Établissement précédent
+                                <span class="required-star">*</span>
                             </label>
 
                             <input
                                 type="text"
-                                name="name"
-                                value="{{ old('name') }}"
-                                placeholder="Nom et prénom du parent"
+                                name="children[${i}][previous_school]"
                                 class="parent-reg-input"
+                                value="${escapeHtml(child.previous_school || '')}"
                                 required
                             >
 
                         </div>
 
 
-                        {{-- EMAIL --}}
+                        {{-- STUDIED PROGRAM --}}
                         <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
-                                E-mail <span class="parent-reg-required">*</span>
+                                Programme étudié
+                                <span class="required-star">*</span>
                             </label>
 
                             <input
-                                type="email"
-                                name="email"
-                                value="{{ old('email') }}"
-                                placeholder="parent@email.com"
+                                type="text"
+                                name="children[${i}][studied_program]"
                                 class="parent-reg-input"
+                                value="${escapeHtml(child.studied_program || '')}"
                                 required
                             >
 
                         </div>
 
 
-                        {{-- TÉLÉPHONE --}}
+                        {{-- REQUESTED LEVEL --}}
                         <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
-                                Téléphone portable <span class="parent-reg-required">*</span>
+                                Niveau demandé
+                                <span class="required-star">*</span>
+                            </label>
+
+                            <select
+                                name="children[${i}][requested_level]"
+                                class="parent-reg-select requested-level"
+                                required
+                            >
+
+                                <option value="">
+                                    Sélectionnez...
+                                </option>
+
+                                <option
+                                    value="1ere-annee"
+                                    ${requestedLevel === '1ere-annee' ? 'selected' : ''}
+                                >
+                                    1ère année
+                                </option>
+
+                                <option
+                                    value="2eme-annee"
+                                    ${requestedLevel === '2eme-annee' ? 'selected' : ''}
+                                >
+                                    2ème année
+                                </option>
+
+                                <option
+                                    value="3eme-annee"
+                                    ${requestedLevel === '3eme-annee' ? 'selected' : ''}
+                                >
+                                    3ème année
+                                </option>
+
+                                <option
+                                    value="4eme-annee"
+                                    ${requestedLevel === '4eme-annee' ? 'selected' : ''}
+                                >
+                                    4ème année
+                                </option>
+
+                                <option
+                                    value="5eme-annee"
+                                    ${requestedLevel === '5eme-annee' ? 'selected' : ''}
+                                >
+                                    5ème année
+                                </option>
+
+                                <option
+                                    value="6eme-annee"
+                                    ${requestedLevel === '6eme-annee' ? 'selected' : ''}
+                                >
+                                    6ème année
+                                </option>
+
+                                <option
+                                    value="College"
+                                    ${requestedLevel === 'College' ? 'selected' : ''}
+                                >
+                                    Collège
+                                </option>
+
+                                <option
+                                    value="Premiere-generale"
+                                    ${requestedLevel === 'Premiere-generale' ? 'selected' : ''}
+                                >
+                                    Première générale
+                                </option>
+
+                                <option
+                                    value="Terminale-generale"
+                                    ${requestedLevel === 'Terminale-generale' ? 'selected' : ''}
+                                >
+                                    Terminale générale
+                                </option>
+
+                                <option
+                                    value="Autre"
+                                    ${requestedLevel === 'Autre' ? 'selected' : ''}
+                                >
+                                    Autre
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        {{-- STUDENT NAME --}}
+                        <div class="parent-reg-field">
+
+                            <label class="parent-reg-label">
+                                Nom et prénom de l'enfant
+                                <span class="required-star">*</span>
                             </label>
 
                             <input
                                 type="text"
-                                name="phone"
-                                value="{{ old('phone') }}"
-                                placeholder="+213 XX XX XX XX"
+                                name="children[${i}][student_name]"
                                 class="parent-reg-input"
+                                value="${escapeHtml(child.student_name || '')}"
                                 required
                             >
 
                         </div>
 
 
-                        {{-- DEUXIÈME TÉLÉPHONE --}}
+                        {{-- DATE OF BIRTH --}}
                         <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
-                                Deuxième téléphone
-                            </label>
-
-                            <input
-                                type="text"
-                                name="phone2"
-                                value="{{ old('phone2') }}"
-                                placeholder="+213 XX XX XX XX"
-                                class="parent-reg-input"
-                            >
-
-                        </div>
-
-
-                        {{-- DATE D'INSCRIPTION --}}
-                        <div class="parent-reg-field">
-
-                            <label class="parent-reg-label">
-                                Date d'inscription <span class="parent-reg-required">*</span>
+                                Date de naissance
+                                <span class="required-star">*</span>
                             </label>
 
                             <input
                                 type="date"
-                                name="registration_date"
-                                value="{{ old('registration_date', date('Y-m-d')) }}"
+                                name="children[${i}][student_date_of_birth]"
                                 class="parent-reg-input"
+                                value="${escapeHtml(child.student_date_of_birth || '')}"
                                 required
                             >
 
                         </div>
 
 
-                        {{-- NOMBRE D'ENFANTS --}}
+                        {{-- PLACE OF BIRTH --}}
                         <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
-                                Nombre d'enfants <span class="parent-reg-required">*</span>
+                                Lieu de naissance
+                                <span class="required-star">*</span>
                             </label>
 
-                            <select
-                                name="number_of_children"
-                                class="parent-reg-select"
+                            <input
+                                type="text"
+                                name="children[${i}][student_place_of_birth]"
+                                class="parent-reg-input"
+                                value="${escapeHtml(child.student_place_of_birth || '')}"
                                 required
                             >
-
-                                <option value="">Sélectionnez...</option>
-
-                                <option value="1" {{ old('number_of_children') == '1' ? 'selected' : '' }}>
-                                    1
-                                </option>
-
-                                <option value="2" {{ old('number_of_children') == '2' ? 'selected' : '' }}>
-                                    2
-                                </option>
-
-                                <option value="3" {{ old('number_of_children') == '3' ? 'selected' : '' }}>
-                                    3
-                                </option>
-
-                                <option value="4" {{ old('number_of_children') == '4' ? 'selected' : '' }}>
-                                    Autre
-                                </option>
-
-                            </select>
 
                         </div>
 
 
-                        {{-- ADRESSE --}}
-                        <div class="parent-reg-field parent-reg-field-full">
+                        {{-- STUDENT ADDRESS --}}
+                        <div class="parent-reg-field full">
 
                             <label class="parent-reg-label">
-                                Adresse
+                                Adresse de l'enfant
+                                <span class="required-star">*</span>
                             </label>
 
                             <textarea
-                                name="address"
-                                placeholder="Adresse de résidence du parent"
+                                name="children[${i}][student_address]"
                                 class="parent-reg-textarea"
-                            >{{ old('address') }}</textarea>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- ==================================================
-                         SCOLARITÉ
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Scolarité
-                    </h4>
-
-                    <div class="parent-reg-grid">
-
-
-                        {{-- ÉCOLE PRÉCÉDENTE --}}
-                        <div class="parent-reg-field">
-
-                            <label class="parent-reg-label">
-                                École précédente <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                name="previous_school"
-                                value="{{ old('previous_school') }}"
-                                placeholder="Nom de l'établissement"
-                                class="parent-reg-input"
                                 required
-                            >
+                            >${escapeHtml(child.student_address || '')}</textarea>
 
                         </div>
 
 
-                        {{-- PROGRAMME --}}
+                        {{-- STUDENT STATUS --}}
                         <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
-                                Programme déjà étudié <span class="parent-reg-required">*</span>
+                                Situation de l'enfant
+                                <span class="required-star">*</span>
                             </label>
 
                             <select
-                                name="studied_program"
+                                name="children[${i}][student_status]"
                                 class="parent-reg-select"
                                 required
                             >
 
-                                <option value="">Sélectionnez...</option>
-
-                                <option value="National"
-                                    {{ old('studied_program') == 'National' ? 'selected' : '' }}>
-                                    National
+                                <option value="">
+                                    Sélectionnez...
                                 </option>
 
-                                <option value="Français"
-                                    {{ old('studied_program') == 'Français' ? 'selected' : '' }}>
-                                    Français
+                                <option
+                                    value="Nouveau"
+                                    ${child.student_status === 'Nouveau' ? 'selected' : ''}
+                                >
+                                    Nouveau
                                 </option>
 
-                                <option value="Britannique"
-                                    {{ old('studied_program') == 'Britannique' ? 'selected' : '' }}>
-                                    Britannique
+                                <option
+                                    value="Ancien élève"
+                                    ${child.student_status === 'Ancien élève' ? 'selected' : ''}
+                                >
+                                    Ancien élève
                                 </option>
 
-                                <option value="Autre"
-                                    {{ old('studied_program') == 'Autre' ? 'selected' : '' }}>
-                                    Autre
+                                <option
+                                    value="Transfert"
+                                    ${child.student_status === 'Transfert' ? 'selected' : ''}
+                                >
+                                    Transfert
                                 </option>
 
                             </select>
@@ -530,575 +1185,643 @@
                         </div>
 
 
-                        {{-- NIVEAU --}}
-                        <div class="parent-reg-field parent-reg-field-full">
-
-                            <label class="parent-reg-label">
-                                Niveau demandé <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <select
-                                name="requested_level"
-                                class="parent-reg-select"
-                                required
-                            >
-
-                                <option value="">Sélectionnez...</option>
-
-                                <option value="5eme"
-                                    {{ old('requested_level') == '5eme' ? 'selected' : '' }}>
-                                    5ème
-                                </option>
-
-                                <option value="4eme"
-                                    {{ old('requested_level') == '4eme' ? 'selected' : '' }}>
-                                    4ème
-                                </option>
-
-                                <option value="3eme-DNB"
-                                    {{ old('requested_level') == '3eme-DNB' ? 'selected' : '' }}>
-                                    3ème - DNB
-                                </option>
-
-                                <option value="Seconde"
-                                    {{ old('requested_level') == 'Seconde' ? 'selected' : '' }}>
-                                    Seconde
-                                </option>
-
-                                <option value="Première"
-                                    {{ old('requested_level') == 'Première' ? 'selected' : '' }}>
-                                    Première
-                                </option>
-
-                                <option value="Terminale"
-                                    {{ old('requested_level') == 'Terminale' ? 'selected' : '' }}>
-                                    Terminale
-                                </option>
-
-                                <option value="Autre"
-                                    {{ old('requested_level') == 'Autre' ? 'selected' : '' }}>
-                                    Autre
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- ==================================================
-                         INFORMATIONS DE L'ÉLÈVE
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Informations de l'élève
-                    </h4>
-
-                    <div class="parent-reg-grid">
-
-
-                        {{-- NOM ÉLÈVE --}}
-                        <div class="parent-reg-field parent-reg-field-full">
-
-                            <label class="parent-reg-label">
-                                Nom et prénom de l'élève <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                name="student_name"
-                                value="{{ old('student_name') }}"
-                                placeholder="Nom et prénom de l'élève"
-                                class="parent-reg-input"
-                                required
-                            >
-
-                        </div>
-
-
-                        {{-- DATE DE NAISSANCE --}}
+                        {{-- EDUCATIONAL NEEDS --}}
                         <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
-                                Date de naissance <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <input
-                                type="date"
-                                name="student_date_of_birth"
-                                value="{{ old('student_date_of_birth') }}"
-                                class="parent-reg-input"
-                                required
-                            >
-
-                        </div>
-
-
-                        {{-- LIEU DE NAISSANCE --}}
-                        <div class="parent-reg-field">
-
-                            <label class="parent-reg-label">
-                                Lieu de naissance <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                name="student_place_of_birth"
-                                value="{{ old('student_place_of_birth') }}"
-                                placeholder="Ville de naissance"
-                                class="parent-reg-input"
-                                required
-                            >
-
-                        </div>
-
-
-                        {{-- ADRESSE ÉLÈVE --}}
-                        <div class="parent-reg-field parent-reg-field-full">
-
-                            <label class="parent-reg-label">
-                                Adresse de l'élève <span class="parent-reg-required">*</span>
+                                Besoins éducatifs particuliers
+                                <span class="required-star">*</span>
                             </label>
 
                             <textarea
-                                name="student_address"
-                                placeholder="Adresse de résidence de l'élève"
+                                name="children[${i}][educational_needs]"
                                 class="parent-reg-textarea"
                                 required
-                            >{{ old('student_address') }}</textarea>
+                            >${escapeHtml(child.educational_needs || '')}</textarea>
 
                         </div>
 
 
-                        {{-- STATUT --}}
-                        <div class="parent-reg-field parent-reg-field-full">
-
-                            <label class="parent-reg-label">
-                                Statut de l'élève <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <select
-                                name="student_status"
-                                class="parent-reg-select"
-                                required
-                            >
-
-                                <option value="">Sélectionnez...</option>
-
-                                <option value="Candidat Libre"
-                                    {{ old('student_status') == 'Candidat Libre' ? 'selected' : '' }}>
-                                    Candidat Libre
-                                </option>
-
-                                <option value="CNED"
-                                    {{ old('student_status') == 'CNED' ? 'selected' : '' }}>
-                                    CNED
-                                </option>
-
-                                <option value="Étudiant"
-                                    {{ old('student_status') == 'Étudiant' ? 'selected' : '' }}>
-                                    Étudiant
-                                </option>
-
-                                <option value="Autre"
-                                    {{ old('student_status') == 'Autre' ? 'selected' : '' }}>
-                                    Autre
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- ==================================================
-                         INFORMATIONS ACADÉMIQUES
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Informations académiques
-                    </h4>
-
-                    <div class="parent-reg-grid">
-
-
-                        {{-- MATIÈRE ABANDONNÉE --}}
-                        <div class="parent-reg-field">
+                        {{-- DROPPED SUBJECT --}}
+                        <div
+                            class="parent-reg-field academic-fields"
+                            style="display:${isAcademic ? 'block' : 'none'};"
+                        >
 
                             <label class="parent-reg-label">
                                 Matière abandonnée en Première
+                                <span class="required-star">*</span>
                             </label>
 
-                            <select
-                                name="dropped_subject"
-                                class="parent-reg-select"
+                            <input
+                                type="text"
+                                name="children[${i}][dropped_subject]"
+                                class="parent-reg-input dropped-subject"
+                                value="${escapeHtml(child.dropped_subject || '')}"
+                                ${isAcademic ? 'required' : ''}
                             >
-
-                                <option value="">Sélectionnez...</option>
-
-                                <option value="Physique-chimie"
-                                    {{ old('dropped_subject') == 'Physique-chimie' ? 'selected' : '' }}>
-                                    Physique-chimie
-                                </option>
-
-                                <option value="SVT"
-                                    {{ old('dropped_subject') == 'SVT' ? 'selected' : '' }}>
-                                    SVT
-                                </option>
-
-                                <option value="SES"
-                                    {{ old('dropped_subject') == 'SES' ? 'selected' : '' }}>
-                                    SES
-                                </option>
-
-                                <option value="Non concerné"
-                                    {{ old('dropped_subject') == 'Non concerné' ? 'selected' : '' }}>
-                                    Non concerné
-                                </option>
-
-                                <option value="Autre"
-                                    {{ old('dropped_subject') == 'Autre' ? 'selected' : '' }}>
-                                    Autre
-                                </option>
-
-                            </select>
 
                         </div>
 
 
-                        {{-- SPÉCIALITÉS TERMINALE --}}
-                        <div class="parent-reg-field">
+                        {{-- SPECIALTIES --}}
+                        <div
+                            class="parent-reg-field full academic-fields"
+                            style="display:${isAcademic ? 'block' : 'none'};"
+                        >
 
                             <label class="parent-reg-label">
-                                Spécialités Terminale
+                                Spécialités
+                                <span class="required-star">*</span>
                             </label>
 
-                            <select
-                                name="terminal_specialties"
-                                class="parent-reg-select"
-                            >
+                            <div class="checkbox-group specialties-group">
 
-                                <option value="">Sélectionnez...</option>
+                                ${createCheckboxes(
+                                    `children[${i}][terminal_specialties]`,
+                                    SPECIALTIES,
+                                    specialties
+                                )}
 
-                                <option value="Mathématiques"
-                                    {{ old('terminal_specialties') == 'Mathématiques' ? 'selected' : '' }}>
-                                    Mathématiques
-                                </option>
+                            </div>
 
-                                <option value="Physique-chimie"
-                                    {{ old('terminal_specialties') == 'Physique-chimie' ? 'selected' : '' }}>
-                                    Physique-chimie
-                                </option>
-
-                                <option value="SVT"
-                                    {{ old('terminal_specialties') == 'SVT' ? 'selected' : '' }}>
-                                    SVT
-                                </option>
-
-                                <option value="SES"
-                                    {{ old('terminal_specialties') == 'SES' ? 'selected' : '' }}>
-                                    SES
-                                </option>
-
-                                <option value="Non concerné"
-                                    {{ old('terminal_specialties') == 'Non concerné' ? 'selected' : '' }}>
-                                    Non concerné
-                                </option>
-
-                            </select>
+                            <div class="help-text">
+                                Veuillez sélectionner exactement 2 spécialités.
+                            </div>
 
                         </div>
 
 
-                        {{-- LANGUES --}}
-                        <div class="parent-reg-field parent-reg-field-full">
+                        {{-- LANGUAGES --}}
+                        <div
+                            class="parent-reg-field full academic-fields"
+                            style="display:${isAcademic ? 'block' : 'none'};"
+                        >
 
                             <label class="parent-reg-label">
-                                Langues <span class="parent-reg-required">*</span>
+                                Langues
+                                <span class="required-star">*</span>
                             </label>
 
-                            <select
-                                name="languages"
-                                class="parent-reg-select"
-                                required
-                            >
+                            <div class="checkbox-group languages-group">
 
-                                <option value="">Sélectionnez...</option>
+                                ${createCheckboxes(
+                                    `children[${i}][languages]`,
+                                    LANGUAGES,
+                                    languages
+                                )}
 
-                                <option value="Arabe"
-                                    {{ old('languages') == 'Arabe' ? 'selected' : '' }}>
-                                    Arabe
-                                </option>
+                            </div>
 
-                                <option value="Anglais"
-                                    {{ old('languages') == 'Anglais' ? 'selected' : '' }}>
-                                    Anglais
-                                </option>
-
-                                <option value="Espagnol"
-                                    {{ old('languages') == 'Espagnol' ? 'selected' : '' }}>
-                                    Espagnol
-                                </option>
-
-                                <option value="Autre"
-                                    {{ old('languages') == 'Autre' ? 'selected' : '' }}>
-                                    Autre
-                                </option>
-
-                            </select>
+                            <div class="help-text">
+                                Veuillez sélectionner exactement 2 langues.
+                            </div>
 
                         </div>
 
-                    </div>
 
-
-                    {{-- ==================================================
-                         BESOINS ÉDUCATIFS
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Besoins éducatifs particuliers
-                    </h4>
-
-                    <div class="parent-reg-grid">
-
-                        <div class="parent-reg-field parent-reg-field-full">
-
-                            <label class="parent-reg-label">
-                                Besoins éducatifs <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <select
-                                name="educational_needs"
-                                class="parent-reg-select"
-                                required
-                            >
-
-                                <option value="">Sélectionnez...</option>
-
-                                <option value="Rien"
-                                    {{ old('educational_needs') == 'Rien' ? 'selected' : '' }}>
-                                    Rien
-                                </option>
-
-                                <option value="Dyslexie"
-                                    {{ old('educational_needs') == 'Dyslexie' ? 'selected' : '' }}>
-                                    Dyslexie
-                                </option>
-
-                                <option value="TDAH"
-                                    {{ old('educational_needs') == 'TDAH' ? 'selected' : '' }}>
-                                    TDAH
-                                </option>
-
-                                <option value="Autre"
-                                    {{ old('educational_needs') == 'Autre' ? 'selected' : '' }}>
-                                    Autre
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- ==================================================
-                         ACTIVITÉS EXTRASCOLAIRES
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Activités extrascolaires
-                    </h4>
-
-                    <div class="parent-reg-grid">
-
-
-                        {{-- ACTIVITÉS --}}
-                        <div class="parent-reg-field parent-reg-field-full">
+                        {{-- EXTRACURRICULAR ACTIVITIES --}}
+                        <div class="parent-reg-field full">
 
                             <label class="parent-reg-label">
                                 Activités extrascolaires
                             </label>
 
                             <textarea
-                                name="extracurricular_activities"
-                                placeholder="Sports, musique, arts, autres activités..."
+                                name="children[${i}][extracurricular_activities]"
                                 class="parent-reg-textarea"
-                            >{{ old('extracurricular_activities') }}</textarea>
+                            >${escapeHtml(child.extracurricular_activities || '')}</textarea>
 
                         </div>
 
 
-                        {{-- CLUBS --}}
-                        <div class="parent-reg-field parent-reg-field-full">
+                        {{-- INTERESTED CLUBS --}}
+                        <div class="parent-reg-field full">
 
                             <label class="parent-reg-label">
-                                Clubs qui vous intéressent
+                                Clubs ou activités qui l'intéressent
                             </label>
 
                             <textarea
-                                name="interested_clubs"
-                                placeholder="Indiquez les clubs ou activités qui pourraient vous intéresser..."
+                                name="children[${i}][interested_clubs]"
                                 class="parent-reg-textarea"
-                            >{{ old('interested_clubs') }}</textarea>
+                            >${escapeHtml(child.interested_clubs || '')}</textarea>
 
                         </div>
 
                     </div>
 
+                </div>
 
-                    {{-- ==================================================
-                         RENSEIGNEMENTS COMPLÉMENTAIRES
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Renseignements complémentaires
-                    </h4>
+            `;
+        }
 
-                    <div class="parent-reg-grid">
+        childrenContainer.innerHTML = html;
 
+        attachLevelListeners();
 
-                        {{-- COMMENT AVEZ-VOUS CONNU L'ÉCOLE --}}
-                        <div class="parent-reg-field parent-reg-field-full">
+        limitAcademicCheckboxes();
 
-                            <label class="parent-reg-label">
-                                Comment avez-vous connu l'école ?
-                                <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <select
-                                name="how_did_you_hear"
-                                class="parent-reg-select"
-                                required
-                            >
-
-                                <option value="">Sélectionnez...</option>
-
-                                <option value="Publicité"
-                                    {{ old('how_did_you_hear') == 'Publicité' ? 'selected' : '' }}>
-                                    Publicité
-                                </option>
-
-                                <option value="Bouche à oreille"
-                                    {{ old('how_did_you_hear') == 'Bouche à oreille' ? 'selected' : '' }}>
-                                    Bouche à oreille
-                                </option>
-
-                                <option value="Réseaux sociaux"
-                                    {{ old('how_did_you_hear') == 'Réseaux sociaux' ? 'selected' : '' }}>
-                                    Réseaux sociaux
-                                </option>
-
-                                <option value="Recommandation ancien élève"
-                                    {{ old('how_did_you_hear') == 'Recommandation ancien élève' ? 'selected' : '' }}>
-                                    Recommandation d'un ancien élève
-                                </option>
-
-                                <option value="Autre"
-                                    {{ old('how_did_you_hear') == 'Autre' ? 'selected' : '' }}>
-                                    Autre
-                                </option>
-
-                            </select>
-
-                        </div>
+    }
 
 
-                        {{-- INFORMATIONS SUPPLÉMENTAIRES --}}
-                        <div class="parent-reg-field parent-reg-field-full">
+    /*
+    |--------------------------------------------------------------------------
+    | REQUESTED LEVEL LISTENERS
+    |--------------------------------------------------------------------------
+    */
 
-                            <label class="parent-reg-label">
-                                Informations supplémentaires
-                                <span class="parent-reg-required">*</span>
-                            </label>
+    function attachLevelListeners() {
 
-                            <textarea
-                                name="additional_information"
-                                placeholder="Toute information complémentaire que vous souhaitez communiquer à l'administration..."
-                                class="parent-reg-textarea"
-                                required
-                            >{{ old('additional_information') }}</textarea>
+        document
+            .querySelectorAll('.requested-level')
+            .forEach(select => {
 
-                        </div>
+                select.addEventListener('change', function () {
 
-                    </div>
+                    const card =
+                        this.closest('.child-card');
 
+                    if (!card) {
+                        return;
+                    }
 
-                    {{-- ==================================================
-                         CRÉATION DU COMPTE
-                         ================================================== --}}
-                    <h4 class="parent-reg-section-title">
-                        Création du compte
-                    </h4>
+                    updateAcademicFields(
+                        card,
+                        this.value
+                    );
 
-                    <div class="parent-reg-grid">
+                });
 
+            });
 
-                        {{-- MOT DE PASSE --}}
-                        <div class="parent-reg-field">
-
-                            <label class="parent-reg-label">
-                                Mot de passe <span class="parent-reg-required">*</span>
-                            </label>
-
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Votre mot de passe"
-                                class="parent-reg-input"
-                                required
-                            >
-
-                        </div>
+    }
 
 
-                        {{-- CONFIRMATION --}}
-                        <div class="parent-reg-field">
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW / HIDE ACADEMIC FIELDS
+    |--------------------------------------------------------------------------
+    */
 
-                            <label class="parent-reg-label">
-                                Confirmer le mot de passe <span class="parent-reg-required">*</span>
-                            </label>
+    function updateAcademicFields(card, level) {
 
-                            <input
-                                type="password"
-                                name="password_confirmation"
-                                placeholder="Confirmez votre mot de passe"
-                                class="parent-reg-input"
-                                required
-                            >
+        const academicFields =
+            card.querySelectorAll('.academic-fields');
 
-                        </div>
+        const isAcademic =
+            ACADEMIC_LEVELS.includes(level);
 
-                    </div>
+        academicFields.forEach(field => {
+
+            field.style.display =
+                isAcademic ? 'block' : 'none';
+
+        });
+
+        const droppedSubject =
+            card.querySelector('.dropped-subject');
+
+        if (droppedSubject) {
+
+            droppedSubject.required =
+                isAcademic;
+
+            if (!isAcademic) {
+                droppedSubject.value = '';
+            }
+
+        }
+
+        if (!isAcademic) {
+
+            card
+                .querySelectorAll(
+                    'input[name*="[terminal_specialties]"], input[name*="[languages]"]'
+                )
+                .forEach(input => {
+
+                    input.checked = false;
+
+                });
+
+        }
+
+    }
 
 
-                    {{-- ==================================================
-                         APPROBATION
-                         ================================================== --}}
-                    <div class="parent-reg-submit-area">
+    /*
+    |--------------------------------------------------------------------------
+    | LIMIT ACADEMIC CHECKBOXES
+    |--------------------------------------------------------------------------
+    */
 
-                        <p class="parent-reg-help" style="margin-bottom: 20px; font-size: 13px;">
-                            Après l'envoi de votre dossier, votre compte sera examiné par
-                            l'administration. Vous pourrez vous connecter une fois votre
-                            compte approuvé.
-                        </p>
+    function limitAcademicCheckboxes() {
 
-                        <button
-                            type="submit"
-                            class="parent-reg-submit"
-                        >
-                            Envoyer le dossier d'inscription
-                        </button>
+        document
+            .querySelectorAll('.specialties-group input[type="checkbox"]')
+            .forEach(checkbox => {
 
-                    </div>
+                checkbox.addEventListener('change', function () {
+
+                    const group =
+                        this.closest('.specialties-group');
+
+                    const checked =
+                        group.querySelectorAll(
+                            'input[type="checkbox"]:checked'
+                        );
+
+                    if (checked.length > 2) {
+
+                        this.checked = false;
+
+                        alert(
+                            'Vous pouvez sélectionner exactement deux spécialités.'
+                        );
+
+                    }
+
+                });
+
+            });
 
 
-                </form>
+        document
+            .querySelectorAll('.languages-group input[type="checkbox"]')
+            .forEach(checkbox => {
 
-            </div>
+                checkbox.addEventListener('change', function () {
 
-        </div>
+                    const group =
+                        this.closest('.languages-group');
 
-    </div>
+                    const checked =
+                        group.querySelectorAll(
+                            'input[type="checkbox"]:checked'
+                        );
 
-</div>
+                    if (checked.length > 2) {
 
-@endsection
+                        this.checked = false;
+
+                        alert(
+                            'Vous pouvez sélectionner exactement deux langues.'
+                        );
+
+                    }
+
+                });
+
+            });
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHILDREN COUNT
+    |--------------------------------------------------------------------------
+    */
+
+    childrenSelect.addEventListener('change', function () {
+
+        const value = this.value;
+
+        if (value === 'Autre') {
+
+            childrenCustom.style.display = 'block';
+
+            childrenCustom.focus();
+
+            childrenHidden.value =
+                childrenCustom.value || '';
+
+            return;
+        }
+
+        childrenCustom.style.display = 'none';
+
+        const count =
+            parseInt(value);
+
+        if (!isNaN(count) && count > 0) {
+
+            childrenHidden.value =
+                count;
+
+            renderChildren(
+                count,
+                currentChildrenData()
+            );
+
+        } else {
+
+            childrenHidden.value = '';
+
+            childrenContainer.innerHTML = '';
+
+        }
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CUSTOM CHILDREN COUNT
+    |--------------------------------------------------------------------------
+    */
+
+    childrenCustom.addEventListener('input', function () {
+
+        let count =
+            parseInt(this.value);
+
+        if (isNaN(count) || count < 1) {
+
+            childrenHidden.value = '';
+
+            childrenContainer.innerHTML = '';
+
+            return;
+        }
+
+        childrenHidden.value =
+            count;
+
+        renderChildren(
+            count,
+            currentChildrenData()
+        );
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PASSWORD MATCH
+    |--------------------------------------------------------------------------
+    */
+
+    const password =
+        document.getElementById('password');
+
+    const passwordConfirmation =
+        document.getElementById('password_confirmation');
+
+    const passwordMatchMessage =
+        document.getElementById('password-match-message');
+
+
+    function checkPasswordsMatch() {
+
+        if (!passwordConfirmation.value) {
+
+            passwordMatchMessage.textContent = '';
+
+            return true;
+        }
+
+        if (
+            password.value !==
+            passwordConfirmation.value
+        ) {
+
+            passwordMatchMessage.textContent =
+                'Les mots de passe ne correspondent pas.';
+
+            passwordMatchMessage.style.color =
+                '#dc2626';
+
+            return false;
+
+        }
+
+        passwordMatchMessage.textContent =
+            'Les mots de passe correspondent.';
+
+        passwordMatchMessage.style.color =
+            '#059669';
+
+        return true;
+    }
+
+
+    password.addEventListener(
+        'input',
+        checkPasswordsMatch
+    );
+
+    passwordConfirmation.addEventListener(
+        'input',
+        checkPasswordsMatch
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FORM SUBMIT
+    |--------------------------------------------------------------------------
+    */
+
+    const form =
+        document.getElementById('parent-reg-form');
+
+    const submitButton =
+        document.getElementById('parent-reg-submit');
+
+
+    form.addEventListener('submit', function (event) {
+
+        let valid = true;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CHILDREN COUNT
+        |--------------------------------------------------------------------------
+        */
+
+        const count =
+            parseInt(childrenHidden.value);
+
+        if (
+            isNaN(count) ||
+            count < 1
+        ) {
+
+            valid = false;
+
+            alert(
+                'Veuillez sélectionner le nombre d\'enfants.'
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PASSWORD MATCH
+        |--------------------------------------------------------------------------
+        */
+
+        if (!checkPasswordsMatch()) {
+
+            valid = false;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACADEMIC VALIDATION
+        |--------------------------------------------------------------------------
+        */
+
+        document
+            .querySelectorAll('.child-card')
+            .forEach(card => {
+
+                const levelSelect =
+                    card.querySelector('.requested-level');
+
+                if (!levelSelect) {
+                    return;
+                }
+
+                const level =
+                    levelSelect.value;
+
+                if (
+                    ACADEMIC_LEVELS.includes(level)
+                ) {
+
+                    const specialties =
+                        card.querySelectorAll(
+                            '.specialties-group input[type="checkbox"]:checked'
+                        );
+
+                    const languages =
+                        card.querySelectorAll(
+                            '.languages-group input[type="checkbox"]:checked'
+                        );
+
+                    if (specialties.length !== 2) {
+
+                        valid = false;
+
+                        alert(
+                            'Pour une Première ou Terminale générale, veuillez sélectionner exactement 2 spécialités.'
+                        );
+
+                        return;
+
+                    }
+
+                    if (languages.length !== 2) {
+
+                        valid = false;
+
+                        alert(
+                            'Pour une Première ou Terminale générale, veuillez sélectionner exactement 2 langues.'
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+            });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STOP SUBMISSION
+        |--------------------------------------------------------------------------
+        */
+
+        if (!valid) {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DISABLE BUTTON
+        |--------------------------------------------------------------------------
+        */
+
+        submitButton.disabled = true;
+
+        submitButton.textContent =
+            'Envoi en cours...';
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESTORE OLD FORM DATA
+    |--------------------------------------------------------------------------
+    */
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+
+            let oldCount =
+                parseInt(OLD_NUMBER_OF_CHILDREN);
+
+            if (
+                !isNaN(oldCount) &&
+                oldCount > 0
+            ) {
+
+                if (
+                    oldCount === 1 ||
+                    oldCount === 2 ||
+                    oldCount === 3
+                ) {
+
+                    childrenSelect.value =
+                        String(oldCount);
+
+                    childrenCustom.style.display =
+                        'none';
+
+                } else {
+
+                    childrenSelect.value =
+                        'Autre';
+
+                    childrenCustom.style.display =
+                        'block';
+
+                    childrenCustom.value =
+                        oldCount;
+
+                }
+
+                childrenHidden.value =
+                    oldCount;
+
+                renderChildren(
+                    oldCount,
+                    OLD_CHILDREN
+                );
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
+
