@@ -9,6 +9,56 @@
     <title>Inscription Parent</title>
 
     <style>
+
+        .password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper .parent-reg-input {
+    padding-right: 42px; /* space for the button */
+    width: 100%;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    color: #666;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.7;
+}
+
+.toggle-password:hover {
+    color: #000;
+    opacity: 1;
+}
+
+.toggle-password.is-visible .eye-icon {
+    opacity: 1;
+}
+
+.toggle-password.is-visible .eye-icon::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    transform: rotate(45deg);
+    top: 50%;
+    left: 0;
+}
         * {
             box-sizing: border-box;
         }
@@ -622,13 +672,23 @@
                             <span class="required-star">*</span>
                         </label>
 
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            class="parent-reg-input @error('password') error-input @enderror"
-                            required
-                        >
+                        <div class="password-wrapper">
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                class="parent-reg-input @error('password') error-input @enderror"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="password"
+                                aria-label="Afficher le mot de passe"
+                            >
+                                <span class="eye-icon">👁</span>
+                            </button>
+                        </div>
 
                         @error('password')
                             <div class="child-error">{{ $message }}</div>
@@ -644,13 +704,23 @@
                             <span class="required-star">*</span>
                         </label>
 
-                        <input
-                            type="password"
-                            name="password_confirmation"
-                            id="password_confirmation"
-                            class="parent-reg-input"
-                            required
-                        >
+                        <div class="password-wrapper">
+                            <input
+                                type="password"
+                                name="password_confirmation"
+                                id="password_confirmation"
+                                class="parent-reg-input"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="password_confirmation"
+                                aria-label="Afficher le mot de passe"
+                            >
+                                <span class="eye-icon">👁</span>
+                            </button>
+                        </div>
 
                         <div
                             id="password-match-message"
@@ -719,20 +789,19 @@
 
     const SPECIALTIES = [
         'Mathématiques',
-        'Physique',
-        'Sciences naturelles',
-        'Économie',
-        'Gestion',
-        'Littérature',
-        'Langues étrangères'
+        'Physique - Chimie',
+        'SVT',
+        'SES',
+        'HGGSP',
+        'LLCER',
+        
     ];
 
     const LANGUAGES = [
-        'Français',
+        'Arab',
         'Anglais',
         'Espagnol',
-        'Allemand',
-        'Italien'
+       
     ];
 
 
@@ -975,7 +1044,7 @@
 
 
                         {{-- REQUESTED LEVEL --}}
-                        <div class="parent-reg-field">
+                       <div class="parent-reg-field">
 
                             <label class="parent-reg-label">
                                 Niveau demandé
@@ -993,52 +1062,38 @@
                                 </option>
 
                                 <option
-                                    value="1ere-annee"
-                                    ${requestedLevel === '1ere-annee' ? 'selected' : ''}
+                                    value="Sixieme"
+                                    ${requestedLevel === 'Sixieme' ? 'selected' : ''}
                                 >
-                                    1ère année
+                                    Sixième
                                 </option>
 
                                 <option
-                                    value="2eme-annee"
-                                    ${requestedLevel === '2eme-annee' ? 'selected' : ''}
+                                    value="Cinquieme"
+                                    ${requestedLevel === 'Cinquieme' ? 'selected' : ''}
                                 >
-                                    2ème année
+                                    Cinquième
                                 </option>
 
                                 <option
-                                    value="3eme-annee"
-                                    ${requestedLevel === '3eme-annee' ? 'selected' : ''}
+                                    value="Quatrieme"
+                                    ${requestedLevel === 'Quatrieme' ? 'selected' : ''}
                                 >
-                                    3ème année
+                                    Quatrième
                                 </option>
 
                                 <option
-                                    value="4eme-annee"
-                                    ${requestedLevel === '4eme-annee' ? 'selected' : ''}
+                                    value="Troisieme"
+                                    ${requestedLevel === 'Troisieme' ? 'selected' : ''}
                                 >
-                                    4ème année
+                                    Troisième
                                 </option>
 
                                 <option
-                                    value="5eme-annee"
-                                    ${requestedLevel === '5eme-annee' ? 'selected' : ''}
+                                    value="Seconde"
+                                    ${requestedLevel === 'Seconde' ? 'selected' : ''}
                                 >
-                                    5ème année
-                                </option>
-
-                                <option
-                                    value="6eme-annee"
-                                    ${requestedLevel === '6eme-annee' ? 'selected' : ''}
-                                >
-                                    6ème année
-                                </option>
-
-                                <option
-                                    value="College"
-                                    ${requestedLevel === 'College' ? 'selected' : ''}
-                                >
-                                    Collège
+                                    Seconde
                                 </option>
 
                                 <option
@@ -1049,6 +1104,13 @@
                                 </option>
 
                                 <option
+                                    value="Premiere-STMG"
+                                    ${requestedLevel === 'Premiere-STMG' ? 'selected' : ''}
+                                >
+                                    Première STMG
+                                </option>
+
+                                <option
                                     value="Terminale-generale"
                                     ${requestedLevel === 'Terminale-generale' ? 'selected' : ''}
                                 >
@@ -1056,10 +1118,10 @@
                                 </option>
 
                                 <option
-                                    value="Autre"
-                                    ${requestedLevel === 'Autre' ? 'selected' : ''}
+                                    value="Terminale-STMG"
+                                    ${requestedLevel === 'Terminale-STMG' ? 'selected' : ''}
                                 >
-                                    Autre
+                                    Terminale STMG
                                 </option>
 
                             </select>
@@ -1432,12 +1494,12 @@
                             'input[type="checkbox"]:checked'
                         );
 
-                    if (checked.length > 2) {
+                    if (checked.length > 3) {
 
                         this.checked = false;
 
                         alert(
-                            'Vous pouvez sélectionner exactement deux spécialités.'
+                            'Vous pouvez sélectionner exactement trois spécialités.'
                         );
 
                     }
@@ -1821,7 +1883,27 @@
     );
 
 </script>
+<script>
+    document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        if (!input) return;
 
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+
+        // Toggle the "visible" state for styling (eye slash, etc.)
+        this.classList.toggle('is-visible', isPassword);
+
+        // Update accessibility label
+        this.setAttribute(
+            'aria-label',
+            isPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
+        );
+    });
+});
+</script>
 </body>
 </html>
 

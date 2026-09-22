@@ -7,6 +7,42 @@
        INSCRIPTION ENSEIGNANT
        ========================================= */
 
+       .password-wrapper .parent-reg-input,
+.password-wrapper .teacher-reg-input {
+    padding-right: 42px;
+    width: 100%;
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    color: #666;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.7;
+}
+
+.toggle-password:hover {
+    color: #000;
+    opacity: 1;
+}
+
     .teacher-reg-page {
         width: 100%;
         min-height: 100vh;
@@ -483,13 +519,24 @@
                             <span class="teacher-reg-required">*</span>
                         </label>
 
-                        <input
-                            type="password"
-                            name="password"
-                            class="teacher-reg-input"
-                            placeholder="Choisissez un mot de passe"
-                            required
-                        >
+                        <div class="password-wrapper">
+                            <input
+                                type="password"
+                                name="password"
+                                id="teacher-password"
+                                class="teacher-reg-input"
+                                placeholder="Choisissez un mot de passe"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="teacher-password"
+                                aria-label="Afficher le mot de passe"
+                            >
+                                <span class="eye-icon">👁</span>
+                            </button>
+                        </div>
 
                     </div>
 
@@ -661,5 +708,25 @@
 
 
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+
+        togglePasswordButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const targetInputId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetInputId);
+
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    this.setAttribute('aria-label', 'Masquer le mot de passe');
+                } else {
+                    targetInput.type = 'password';
+                    this.setAttribute('aria-label', 'Afficher le mot de passe');
+                }
+            });
+        });
+    });
+</script>
 
 @endsection
