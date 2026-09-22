@@ -6,7 +6,7 @@
 
 <div class="card">
 
-```
+
 <div class="card-header header-elements-inline">
 
     <h6 class="card-title">
@@ -1013,7 +1013,13 @@
 
                                                     data-requested-level="{{ $app->requested_level }}"
 
-                                                    data-academic-year="{{ $app->academic_year }}"
+data-dropped-subject="{{ $app->dropped_subject }}"
+
+data-terminal-specialties="{{ is_array($app->terminal_specialties) ? implode(', ', $app->terminal_specialties) : $app->terminal_specialties }}"
+
+data-languages="{{ is_array($app->languages) ? implode(', ', $app->languages) : $app->languages }}"
+
+data-academic-year="{{ $app->academic_year }}"
 
                                                     data-desired-start-date="{{ $app->desired_start_date }}"
 
@@ -1131,7 +1137,7 @@
     </div>
 
 </div>
-```
+
 
 </div>
 
@@ -1141,7 +1147,7 @@
 
 @foreach ($users->where('user_type', 'parent') as $parent)
 
-```
+
 @php
 
     $children = $parent->children;
@@ -1788,7 +1794,7 @@
     </div>
 
 </div>
-```
+
 
 @endforeach
 
@@ -1801,7 +1807,7 @@
      tabindex="-1"
      role="dialog">
 
-```
+
 <div class="modal-dialog"
      role="document">
 
@@ -1918,7 +1924,7 @@
     </div>
 
 </div>
-```
+
 
 </div>
 
@@ -1933,7 +1939,7 @@
      aria-labelledby="approveStudentModalLabel"
      aria-hidden="true">
 
-```
+
 <div class="modal-dialog"
      role="document">
 
@@ -2080,7 +2086,7 @@
     </div>
 
 </div>
-```
+
 
 </div>
 
@@ -2095,7 +2101,7 @@
      aria-labelledby="viewStudentApplicationModalLabel"
      aria-hidden="true">
 
-```
+
 <div class="modal-dialog modal-xl"
      role="document">
 
@@ -2295,6 +2301,34 @@
                        class="text-muted"></p>
 
                 </div>
+                |<div class="col-md-4">
+
+    <strong>Dropped Subject</strong>
+
+    <p id="view_app_dropped_subject"
+       class="text-muted"></p>
+
+</div>
+
+
+<div class="col-md-4">
+
+    <strong>Terminal Specialties</strong>
+
+    <p id="view_app_terminal_specialties"
+       class="text-muted"></p>
+
+</div>
+
+
+<div class="col-md-4">
+
+    <strong>Languages</strong>
+
+    <p id="view_app_languages"
+       class="text-muted"></p>
+
+</div>
 
 
                 <div class="col-md-4">
@@ -2586,7 +2620,7 @@
     </div>
 
 </div>
-```
+
 
 </div>
 
@@ -2600,7 +2634,7 @@
      role="dialog"
      aria-hidden="true">
 
-```
+
 <div class="modal-dialog modal-lg"
      role="document">
 
@@ -2789,7 +2823,7 @@
     </div>
 
 </div>
-```
+
 
 </div>
 
@@ -3209,6 +3243,20 @@
             $('#view_app_requested_level').text(
                 button.attr('data-requested-level') || '-'
             );
+
+            $('#view_app_dropped_subject').text(
+    button.attr('data-dropped-subject') || '-'
+);
+
+
+$('#view_app_terminal_specialties').text(
+    button.attr('data-terminal-specialties') || '-'
+);
+
+
+$('#view_app_languages').text(
+    button.attr('data-languages') || '-'
+);
 
 
             $('#view_app_academic_year').text(

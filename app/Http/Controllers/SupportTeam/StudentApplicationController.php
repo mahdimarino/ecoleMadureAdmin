@@ -85,8 +85,41 @@ class StudentApplicationController extends Controller
             'country' => 'nullable|string|max:100',
 
             // Application
+            // Application
             'program' => 'required|string|max:100',
-            'requested_level' => 'required|string|max:100',
+
+            'requested_level' => [
+                'required',
+                'string',
+                'in:Sixieme,Cinquieme,Quatrieme,Troisieme,Seconde,Premiere-generale,Premiere-STMG,Terminale-generale,Terminale-STMG',
+            ],
+
+            'dropped_subject' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'terminal_specialties' => [
+                'nullable',
+                'array',
+            ],
+
+            'terminal_specialties.*' => [
+                'string',
+                'in:Mathématiques,Physique - Chimie,SVT,SES,HGGSP,LLCER',
+            ],
+
+            'languages' => [
+                'nullable',
+                'array',
+            ],
+
+            'languages.*' => [
+                'string',
+                'in:Arab,Anglais,Espagnol',
+            ],
+
             'academic_year' => 'nullable|string|max:50',
             'desired_start_date' => 'nullable|date',
             'academic_notes' => 'nullable|string',
@@ -110,6 +143,44 @@ class StudentApplicationController extends Controller
             'additional_comments' => 'nullable|string',
             'how_did_you_hear' => 'nullable|string|max:255',
         ]);
+
+        $academicLevels = [
+            'Premiere-generale',
+            'Terminale-generale',
+        ];
+
+        if (in_array($validated['requested_level'], $academicLevels)) {
+
+            if (count($validated['terminal_specialties'] ?? []) !== 2) {
+                return back()
+                    ->withErrors([
+                        'terminal_specialties' => 'Veuillez sélectionner exactement 2 spécialités.'
+                    ])
+                    ->withInput();
+            }
+
+            if (count($validated['languages'] ?? []) !== 2) {
+                return back()
+                    ->withErrors([
+                        'languages' => 'Veuillez sélectionner exactement 2 langues.'
+                    ])
+                    ->withInput();
+            }
+
+            if (empty($validated['dropped_subject'])) {
+                return back()
+                    ->withErrors([
+                        'dropped_subject' => 'La matière abandonnée est obligatoire.'
+                    ])
+                    ->withInput();
+            }
+        } else {
+
+            // These fields are only relevant for Première/Terminale générale.
+            $validated['dropped_subject'] = null;
+            $validated['terminal_specialties'] = null;
+            $validated['languages'] = null;
+        }
 
         /*
     |--------------------------------------------------------------------------
@@ -356,6 +427,9 @@ class StudentApplicationController extends Controller
 
         $application->program = $request->program;
         $application->requested_level = $request->requested_level;
+        $application->dropped_subject = $request->dropped_subject;
+        $application->terminal_specialties = $request->terminal_specialties;
+        $application->languages = $request->languages;
         $application->academic_year = $request->academic_year;
         $application->current_school = $request->current_school;
         $application->current_level = $request->current_level;

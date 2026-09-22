@@ -55,12 +55,24 @@ class StudentApplication extends Model
         'admin_notes',
         'reviewed_by',
         'reviewed_at',
+
+        'program',
+        'requested_level',
+        'dropped_subject',
+        'terminal_specialties',
+        'languages',
+        'academic_year',
+        'desired_start_date',
+        'academic_notes',
     ];
 
+    
     protected $casts = [
         'date_of_birth' => 'date',
         'desired_start_date' => 'date',
         'reviewed_at' => 'datetime',
+        'terminal_specialties' => 'array',
+        'languages' => 'array',
     ];
 
     public function reviewer()
