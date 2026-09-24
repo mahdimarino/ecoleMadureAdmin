@@ -34,6 +34,7 @@
                         <tr>
                             <th>#</th>
                             <th>Title</th>
+                            <th>Teacher</th>
                             <th>Class</th>
                             <th>File</th>
                             <th>Size</th>
@@ -57,7 +58,9 @@
                                         </small>
                                     @endif
                                 </td>
-
+<td>
+                                    {{ $material->teacher->name ?? 'N/A' }}
+                                </td>
                                 <td>
                                     {{ $material->my_class->name ?? 'N/A' }}
                                 </td>
