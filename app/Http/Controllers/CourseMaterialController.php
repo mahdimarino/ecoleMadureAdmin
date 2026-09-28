@@ -247,9 +247,11 @@ class CourseMaterialController extends Controller
                 ->get();
         }
 
+        $parentChildren = collect();
+
         return view(
             'pages.course_materials.index',
-            compact('materials')
+            compact('materials', 'parentChildren')
         );
     }
 
@@ -260,12 +262,11 @@ class CourseMaterialController extends Controller
     {
         $parent = Auth::user();
 
-        $students = \App\Models\StudentRecord::where(
-            'my_parent_id',
-            $parent->id
-        )->get();
+        $parentChildren = StudentRecord::with('user', 'my_class')
+            ->where('my_parent_id', $parent->id)
+            ->get();
 
-        $classIds = $students
+        $classIds = $parentChildren
             ->pluck('my_class_id')
             ->filter()
             ->unique();
@@ -280,7 +281,7 @@ class CourseMaterialController extends Controller
 
         return view(
             'pages.course_materials.index',
-            compact('materials')
+            compact('materials', 'parentChildren')
         );
     }
 
