@@ -635,6 +635,9 @@ class UserController extends Controller
             'password.confirmed' =>
             'Les mots de passe ne correspondent pas.',
 
+            'email.unique' =>
+            'Cette adresse email existe déjà. Veuillez utiliser une autre adresse email.',
+
             'children.required' =>
             'Veuillez renseigner au moins un enfant.',
 
