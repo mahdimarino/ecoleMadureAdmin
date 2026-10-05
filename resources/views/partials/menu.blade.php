@@ -310,6 +310,19 @@
                                 class="icon-windows2"></i> <span> Classes</span></a>
                     </li>
 
+                    <li class="nav-item">
+    <a
+        href="{{ route('attendance.index') }}"
+        class="nav-link {{ Route::currentRouteName() == 'attendance.index' ? 'active' : '' }}"
+    >
+        <i class="icon-calendar5"></i>
+
+        <span>
+            Student Attendance
+        </span>
+    </a>
+</li>
+
                     {{-- Manage Dorms --}}
                     {{-- <li class="nav-item">
                         <a href="{{ route('dorms.index') }}"
@@ -394,6 +407,8 @@
                 {{-- @include('pages.' . Qs::getUserType() . '.menu') --}}
 
                 {{-- Manage Account --}}
+                {{-- Student Attendance --}}
+
                 <li class="nav-item">
                     <a href="{{ route('my_account') }}"
                         class="nav-link {{ in_array(Route::currentRouteName(), ['my_account']) ? 'active' : '' }}"><i

@@ -226,6 +226,29 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::group(['namespace' => 'SupportTeam'], function () {
 
+        /*
+|--------------------------------------------------------------------------
+| Student Attendance
+|--------------------------------------------------------------------------
+*/
+
+        Route::group([
+            'prefix' => 'attendance',
+        ], function () {
+
+            Route::get(
+                '/',
+                'AttendanceController@index'
+            )
+                ->name('attendance.index');
+
+            Route::post(
+                '/mark-absent',
+                'AttendanceController@markAbsent'
+            )
+                ->name('attendance.mark_absent');
+        });
+
 
         /*
         |--------------------------------------------------------------------------
@@ -631,6 +654,8 @@ Route::group(['middleware' => 'auth'], function () {
                 }
             );
         });
+
+        
 
 
         /*
@@ -1166,6 +1191,26 @@ Route::group(
             'MyController@children'
         )
             ->name('my_children');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Parent Notifications
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/parent/notifications',
+            'NotificationController@index'
+        )
+            ->name('parent.notifications');
+
+
+        Route::post(
+            '/parent/notifications/{id}/read',
+            'NotificationController@read'
+        )
+            ->name('parent.notifications.read');
     }
 );
 
