@@ -57,7 +57,7 @@
                             >
                         </div>
 
-                        <div class="form-group d-flex align-items-center">
+                        {{-- <div class="form-group d-flex align-items-center">
                             <div class="form-check mb-0">
                                 <label class="form-check-label">
                                     <input
@@ -74,7 +74,7 @@
                             <a href="{{ route('password.request') }}" class="ml-auto">
                                 Mot de passe oublié ?
                             </a>
-                        </div>
+                        </div> --}}
 
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary btn-block">
