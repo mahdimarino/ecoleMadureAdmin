@@ -93,27 +93,37 @@ class CourseMaterialController extends Controller
         ]);
 
         /*
-     * Get all students belonging to this class
+     * Get all student emails belonging to this class
      */
-        $students = StudentRecord::with('user')
+        $emails = StudentRecord::with('user:id,email')
             ->where('my_class_id', $course->class_id)
-            ->get();
+            ->get()
+            ->pluck('user.email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
 
         /*
-     * Send email to every student who has an email address
+     * Send emails AFTER the response is returned to the teacher,
+     * so the upload feels fast and a mail error can't cause a 500.
      */
-        foreach ($students as $student) {
+        dispatch(function () use ($course, $emails) {
 
-            if ($student->user && !empty($student->user->email)) {
+            set_time_limit(0);
 
-                Mail::to($student->user->email)
-                    ->send(new NewCourseMail($course));
+            foreach ($emails as $email) {
+                try {
+                    Mail::to($email)->send(new NewCourseMail($course));
+                } catch (\Throwable $e) {
+                    \Log::error('Course mail failed for ' . $email . ': ' . $e->getMessage());
+                }
             }
-        }
+        })->afterResponse();
 
         return back()->with(
             'flash_success',
-            'Course material uploaded successfully and students have been notified.'
+            'Course material uploaded successfully. Students will be notified by email shortly.'
         );
     }
 

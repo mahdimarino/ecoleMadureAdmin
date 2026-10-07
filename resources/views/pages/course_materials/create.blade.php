@@ -25,7 +25,8 @@
             </div>
         @endif
 
-        <form action="{{ route('teacher.course_materials.store') }}"
+        <form id="materialForm"
+              action="{{ route('teacher.course_materials.store') }}"
               method="POST"
               enctype="multipart/form-data">
 
@@ -118,9 +119,10 @@
             <div class="mt-3">
 
                 <button type="submit"
+                        id="submitBtn"
                         class="btn btn-primary">
-                    <i class="icon-upload"></i>
-                    Upload Material
+                    <i class="icon-upload" id="btnIcon"></i>
+                    <span id="btnText">Upload Material</span>
                 </button>
 
                 <a href="{{ route('teacher.course_materials') }}"
@@ -135,5 +137,14 @@
     </div>
 
 </div>
+
+<script>
+document.getElementById('materialForm').addEventListener('submit', function () {
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    document.getElementById('btnIcon').className = 'icon-spinner2 spinner';
+    document.getElementById('btnText').textContent = 'Uploading... please wait';
+});
+</script>
 
 @endsection
