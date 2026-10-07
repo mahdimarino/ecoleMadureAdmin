@@ -80,8 +80,7 @@ class Qs
 
     public static function hash($id)
     {
-        $date = date('dMY').'CJ';
-        $hash = new Hashids($date, 14);
+        $hash = new Hashids('CJ' . config('app.key'), 14);
         return $hash->encode($id);
     }
 
@@ -109,8 +108,7 @@ class Qs
 
     public static function decodeHash($str, $toString = true)
     {
-        $date = date('dMY').'CJ';
-        $hash = new Hashids($date, 14);
+        $hash = new Hashids('CJ' . config('app.key'), 14);
         $decoded = $hash->decode($str);
         return $toString ? implode(',', $decoded) : $decoded;
     }
