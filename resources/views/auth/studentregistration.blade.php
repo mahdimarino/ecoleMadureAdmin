@@ -326,6 +326,11 @@
                         value="{{ old('parent_email') }}"
                         required
                     >
+                    @error('parent_email')
+    <div class="text-danger" style="font-size: 13px; margin-top: 8px;">
+        {{ $message }}
+    </div>
+@enderror
                 </div>
 
             </div>

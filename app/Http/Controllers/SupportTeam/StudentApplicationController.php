@@ -144,6 +144,18 @@ class StudentApplicationController extends Controller
             'how_did_you_hear' => 'nullable|string|max:255',
         ]);
 
+        
+// Check if the parent email already exists in the users table.
+if (User::where('email', $validated['parent_email'])->exists()) {
+    return back()
+        ->withErrors([
+            'parent_email' => 'Cet email existe déjà. Veuillez utiliser un autre email.',
+        ])
+        ->withInput();
+}
+
+
+
         $academicLevels = [
             'Premiere-generale',
             'Terminale-generale',
