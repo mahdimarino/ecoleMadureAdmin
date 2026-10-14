@@ -121,10 +121,12 @@ class CourseMaterialController extends Controller
             }
         })->afterResponse();
 
-        return back()->with(
-            'flash_success',
-            'Course material uploaded successfully. Students will be notified by email shortly.'
-        );
+        return redirect()
+            ->route('teacher.course_materials')
+            ->with(
+                'flash_success',
+                'Course material uploaded successfully. Students will be notified by email shortly.'
+            );
     }
 
     /**
