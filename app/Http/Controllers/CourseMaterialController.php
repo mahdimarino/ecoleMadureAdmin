@@ -57,6 +57,13 @@ class CourseMaterialController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('UPLOAD reached store', [
+            'user' => Auth::id(),
+            'ip'   => $request->ip(),
+            'ua'   => substr((string) $request->userAgent(), 0, 120),
+            'size' => $request->hasFile('file') ? $request->file('file')->getSize() : null,
+        ]);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -120,6 +127,11 @@ class CourseMaterialController extends Controller
                 }
             }
         })->afterResponse();
+
+        \Log::info('UPLOAD saved, redirecting', [
+            'user' => Auth::id(),
+            'material_id' => $course->id,
+        ]);
 
         return redirect()
             ->route('teacher.course_materials')
