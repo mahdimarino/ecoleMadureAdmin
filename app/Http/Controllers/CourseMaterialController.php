@@ -19,6 +19,12 @@ class CourseMaterialController extends Controller
      */
     public function teacherIndex()
     {
+        \Log::info('LIST reached teacherIndex', [
+            'user' => Auth::id(),
+            'ip'   => request()->ip(),
+            'remote_addr' => request()->server('REMOTE_ADDR'),
+            'xff'  => request()->header('X-Forwarded-For'),
+        ]);
         $user = Auth::user();
 
         if (Qs::userIsTeamSA()) {
@@ -60,6 +66,8 @@ class CourseMaterialController extends Controller
         \Log::info('UPLOAD reached store', [
             'user' => Auth::id(),
             'ip'   => $request->ip(),
+            'remote_addr' => $request->server('REMOTE_ADDR'),
+            'xff'  => $request->header('X-Forwarded-For'),
             'ua'   => substr((string) $request->userAgent(), 0, 120),
             'size' => $request->hasFile('file') ? $request->file('file')->getSize() : null,
         ]);
