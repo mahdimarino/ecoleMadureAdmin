@@ -511,7 +511,7 @@
                                                     @endif
 
                                                     {{-- SUPER ADMIN ACTIONS --}}
-                                                    @if (Qs::userIsSuperAdmin())
+                                                    {{-- @if (Qs::userIsSuperAdmin()) --}}
 
                                                         {{-- RESET PASSWORD --}}
                                                         <a href="#"
@@ -541,7 +541,7 @@
                                                             @method('delete')
                                                         </form>
 
-                                                    @endif
+                                                    {{-- @endif --}}
 
                                                 </div>
 
