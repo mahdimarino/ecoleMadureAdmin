@@ -33,7 +33,10 @@
                         <input name="email" required type="email" class="form-control" value="{{ old('email') }}" placeholder="Your email">
                     </div>
 
-                    <button type="submit" class="btn bg-blue btn-block"><i class="icon-spinner11 mr-2"></i> Reset password</button>
+                    <button type="submit" class="btn bg-blue btn-block" id="resetPasswordBtn">
+    <i class="icon-spinner11 mr-2"></i>
+    Reset password
+</button>
                 </div>
             </div>
         </form>
@@ -42,4 +45,13 @@
     </div>
     </div>
     </div>
+
+    <script>
+    document.querySelector('.login-form').addEventListener('submit', function () {
+        const button = document.getElementById('resetPasswordBtn');
+
+        button.disabled = true;
+        button.innerHTML = '<i class="icon-spinner11 mr-2"></i> Sending...';
+    });
+</script>
 @endsection

@@ -71,24 +71,13 @@
     </div>
 </div>
 
-                        {{-- <div class="form-group d-flex align-items-center">
-                            <div class="form-check mb-0">
-                                <label class="form-check-label">
-                                    <input
-                                        type="checkbox"
-                                        name="remember"
-                                        class="form-input-styled"
-                                        {{ old('remember') ? 'checked' : '' }}
-                                        data-fouc
-                                    >
-                                    Se souvenir de moi
-                                </label>
-                            </div>
+                        
+<div class="form-group text-right">
+    <a href="{{ route('password.request') }}">
+        Mot de passe oublié ?
+    </a>
+</div>
 
-                            <a href="{{ route('password.request') }}" class="ml-auto">
-                                Mot de passe oublié ?
-                            </a>
-                        </div> --}}
 
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary btn-block">
