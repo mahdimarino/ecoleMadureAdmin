@@ -47,15 +47,29 @@
                             >
                         </div>
 
-                        <div class="form-group">
-                            <input
-                                required
-                                name="password"
-                                type="password"
-                                class="form-control"
-                                placeholder="Mot de passe"
-                            >
-                        </div>
+                       <div class="form-group">
+    <div class="input-group">
+        <input
+            required
+            name="password"
+            id="password"
+            type="password"
+            class="form-control"
+            placeholder="Mot de passe"
+        >
+
+        <div class="input-group-append">
+            <button
+                type="button"
+                class="btn btn-light"
+                id="togglePassword"
+                aria-label="Afficher le mot de passe"
+            >
+                <i class="icon-eye" id="passwordIcon"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
                         {{-- <div class="form-group d-flex align-items-center">
                             <div class="form-check mb-0">
@@ -98,6 +112,24 @@
     </div>
 
 </div>
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const password = document.getElementById('password');
+        const icon = document.getElementById('passwordIcon');
+
+        if (password.type === 'password') {
+            password.type = 'text';
+            icon.classList.remove('icon-eye');
+            icon.classList.add('icon-eye-blocked');
+            this.setAttribute('aria-label', 'Masquer le mot de passe');
+        } else {
+            password.type = 'password';
+            icon.classList.remove('icon-eye-blocked');
+            icon.classList.add('icon-eye');
+            this.setAttribute('aria-label', 'Afficher le mot de passe');
+        }
+    });
+</script>
 
 
 @endsection
