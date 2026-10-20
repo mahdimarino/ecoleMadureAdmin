@@ -220,4 +220,17 @@ class StudentRecordController extends Controller
         return back()->with('flash_success', __('msg.del_ok'));
     }
 
+    public function listAll()
+    {
+        $data['students'] = $this->student->getAll()
+            ->with(['my_class', 'section', 'user'])
+            ->get()
+            ->sortBy(function ($student) {
+                return optional($student->user)->name;
+            })
+            ->values();
+
+        return view('pages.support_team.students.all', $data);
+    }
+
 }

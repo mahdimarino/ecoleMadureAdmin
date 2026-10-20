@@ -204,6 +204,12 @@
                                     @endforeach
                                 </ul>
                             </li>
+                            <li class="nav-item">
+    <a href="{{ route('students.all') }}"
+       class="nav-link {{ Route::is('students.all') ? 'active' : '' }}">
+        Tous les étudiants
+    </a>
+</li>
 
                             {{-- @if (Qs::userIsTeamSA())
                                
@@ -296,6 +302,8 @@
                 {{-- Manage Account --}}
 
                 @if (Qs::userIsTeamSA())
+
+                
                     {{-- Manage Users --}}
                     <li class="nav-item">
                         <a href="{{ route('users.index') }}"

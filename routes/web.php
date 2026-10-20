@@ -405,6 +405,13 @@ Route::group(['middleware' => 'auth'], function () {
             )
                 ->name('students.graduated');
 
+            Route::get(
+                'all',
+                'StudentRecordController@listAll'
+            )
+                ->name('students.all')
+                ->middleware('teamSAT');
+
 
             Route::put(
                 'not_graduated/{id}',
