@@ -1122,33 +1122,57 @@
                         <strong id="reset_user_name"></strong>
                     </div>
 
-                    <div class="form-group">
-                        <label>
-                            Nouveau mot de passe :
-                            <span class="text-danger">*</span>
-                        </label>
+                  <div class="form-group">
+    <label>
+        Nouveau mot de passe :
+        <span class="text-danger">*</span>
+    </label>
 
-                        <input type="password"
-                               name="password"
-                               class="form-control"
-                               placeholder="Nouveau mot de passe"
-                               required
-                               minlength="6">
-                    </div>
+    <div class="input-group">
+        <input type="password"
+               id="reset_password"
+               name="password"
+               class="form-control"
+               placeholder="Nouveau mot de passe"
+               required
+               minlength="6">
 
-                    <div class="form-group">
-                        <label>
-                            Confirmer le mot de passe :
-                            <span class="text-danger">*</span>
-                        </label>
+        <div class="input-group-append">
+            <button type="button"
+                    class="btn btn-outline-secondary toggle-password"
+                    data-target="reset_password"
+                    aria-label="Afficher le mot de passe">
+                <i class="icon-eye"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
-                        <input type="password"
-                               name="password_confirmation"
-                               class="form-control"
-                               placeholder="Confirmer le mot de passe"
-                               required
-                               minlength="6">
-                    </div>
+<div class="form-group">
+    <label>
+        Confirmer le mot de passe :
+        <span class="text-danger">*</span>
+    </label>
+
+    <div class="input-group">
+        <input type="password"
+               id="reset_password_confirmation"
+               name="password_confirmation"
+               class="form-control"
+               placeholder="Confirmer le mot de passe"
+               required
+               minlength="6">
+
+        <div class="input-group-append">
+            <button type="button"
+                    class="btn btn-outline-secondary toggle-password"
+                    data-target="reset_password_confirmation"
+                    aria-label="Afficher le mot de passe">
+                <i class="icon-eye"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
                 </div>
 
@@ -1964,6 +1988,24 @@
         }
     }
 
+</script>
+
+<script>
+   $(document).on('click', '.toggle-password', function () {
+    var button = $(this);
+    var input = $('#' + button.data('target'));
+    var icon = button.find('i');
+
+    if (input.attr('type') === 'password') {
+        input.attr('type', 'text');
+        icon.removeClass('icon-eye').addClass('icon-eye-blocked');
+        button.attr('aria-label', 'Masquer le mot de passe');
+    } else {
+        input.attr('type', 'password');
+        icon.removeClass('icon-eye-blocked').addClass('icon-eye');
+        button.attr('aria-label', 'Afficher le mot de passe');
+    }
+});
 </script>
 
 @endsection
