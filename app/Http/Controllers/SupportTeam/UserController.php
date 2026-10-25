@@ -472,6 +472,18 @@ class UserController extends Controller
         |--------------------------------------------------------------------------
         */
 
+            if ($user->user_type === 'teacher') {
+                DB::table('subjects')
+                    ->where('teacher_id', $user->id)
+                    ->update(['teacher_id' => null]);
+            }
+
+            /*
+|--------------------------------------------------------------------------
+| DELETE USER
+|--------------------------------------------------------------------------
+*/
+
             $this->user->delete($user->id);
         });
 
