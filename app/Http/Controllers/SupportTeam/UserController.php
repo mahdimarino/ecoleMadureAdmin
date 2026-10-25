@@ -429,10 +429,10 @@ class UserController extends Controller
             return back()->with('pop_error', 'User not found.');
         }
 
-        // Prevent deleting teacher who teaches subjects
-        if ($user->user_type == 'teacher' && $this->userTeachesSubject($user)) {
-            return back()->with('pop_error', __('msg.del_teacher'));
-        }
+        // // Prevent deleting teacher who teaches subjects
+        // if ($user->user_type == 'teacher' && $this->userTeachesSubject($user)) {
+        //     return back()->with('pop_error', __('msg.del_teacher'));
+        // }
 
         DB::transaction(function () use ($user) {
 
@@ -481,11 +481,11 @@ class UserController extends Controller
         );
     }
 
-    protected function userTeachesSubject($user)
-    {
-        $subjects = $this->my_class->findSubjectByTeacher($user->id);
-        return ($subjects->count() > 0) ? true : false;
-    }
+    // protected function userTeachesSubject($user)
+    // {
+    //     $subjects = $this->my_class->findSubjectByTeacher($user->id);
+    //     return ($subjects->count() > 0) ? true : false;
+    // }
 
     public function parentRegistration()
     {
