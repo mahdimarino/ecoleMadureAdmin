@@ -22,10 +22,17 @@ class LoginController extends Controller
      */
     public function username()
     {
-        $identity = request()->identity;
-        $field = filter_var($identity, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $identity = trim((string) request()->input('identity', ''));
 
-        request()->merge([$field => $identity]);
+        $field = filter_var($identity, FILTER_VALIDATE_EMAIL)
+            ? 'email'
+            : 'username';
+
+        request()->merge([
+            'identity' => $identity,
+            $field => $identity,
+            'password' => trim((string) request()->input('password', '')),
+        ]);
 
         return $field;
     }
